@@ -1,0 +1,18 @@
+# Node
+node_modules/
+dist/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Generated assets
+attached_assets/
+public/animations/
+**/videos/
+
+# Backup folders
+*backup*
