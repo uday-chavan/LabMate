@@ -4,151 +4,131 @@
 
 It combines machine learning, computer vision, OCR, and automation tools to help researchers, students, and lab staff make faster and safer decisions.
 
----
+## 🚀 Features
 
-## 🚀 Core Features
+### ⚗️ Chemical Reaction Predictor
+Predicts complete chemical reaction pathways including optimal conditions and potential side reactions — eliminating costly trial-and-error experimentation.
 
-### 🔬 1. Chemical Reaction Intelligence
+### 📄 Literature Review Assistant
+Instantly fetches relevant research papers based on your query with one-click abstract previews, saving days of manual literature searching.
 
-* Predicts complete **chemical reaction pathways**
-* Suggests **optimal reaction conditions**
-* Highlights potential **side reactions**
-* Reduces trial-and-error experimentation
+### 🔬 Lab Equipment Identifier
+Identifies lab equipment through image recognition and immediately surfaces the relevant safety protocols — no specialized expertise required.
 
-### 📚 2. Smart Literature Review
+### 🏷️ Chemical Label Analyzer (OCR)
+Analyzes chemical labels using OCR to extract and display hazard levels, first-aid instructions, and handling guidelines in structured visual cards.
 
-* Instantly fetches relevant research papers
-* One-click abstract previews
-* Saves hours of manual academic searching
+### 🧬 SMILES to Properties Converter
+Converts SMILES notation directly into physical properties and toxicity data, removing the need for tedious manual database lookups.
 
-### 🧰 3. Lab Equipment Recognition
+### 📊 Process Flow Diagram Generator
+Automatically generates professional process flow diagrams from lab procedures — eliminating manual drawing errors and technical barriers.
 
-* Identifies laboratory equipment using **image recognition**
-* Displays immediate safety protocols
-* Helps non-experts use equipment safely
-
-### 🧾 4. Chemical Label Analysis (OCR)
-
-* Reads chemical labels using OCR
-* Displays:
-
-  * Hazard levels
-  * First-aid instructions
-  * Handling guidelines
-* Presented in clear structured visual cards
-
-### ⚗️ 5. SMILES Analysis
-
-* Converts **SMILES notation** into:
-
-  * Physical properties
-  * Toxicity data
-  * Safety insights
-* Eliminates manual database lookups
-
-### 📊 6. Automatic Process Flow Diagrams
-
-* Generates professional process flow diagrams automatically
-* Reduces manual drawing errors
-* Removes technical barriers for documentation
-
-### 🚨 7. Emergency Alert System
-
-* Sends instant alerts via WhatsApp
-* Includes:
-
-  * Location data
-  * Incident details
-  * Emergency context
-* Helps reduce response time from minutes to seconds
+### 🚨 Emergency WhatsApp Alerts
+Sends instant WhatsApp alerts to lab staff during emergencies with location data and incident details, reducing critical response time from minutes to seconds.
 
 ---
 
-## 🧱 Project Structure
+## 🛠️ Tech Stack
+
+| Layer      | Technology                                         |
+|------------|----------------------------------------------------|
+| Frontend   | React, Vite, TypeScript, Tailwind CSS, shadcn/ui   |
+| Backend    | Node.js, TypeScript, Express                       |
+| Database   | PostgreSQL, Drizzle ORM                            |
+| AI/ML      | Image Recognition, OCR, SMILES parsing             |
+| Integrations | WhatsApp API, Research Paper APIs              |
+| Tooling    | Vite, PostCSS, TypeScript                          |
+
+---
+
+## 📁 Project Structure
 
 ```
 LabMate/
-│
-├── client/        # Frontend application
-├── server/        # Backend APIs & logic
-├── shared/        # Shared types/utilities
-│
+├── client/          # React frontend (Vite)
+│   └── src/         # Components, pages, hooks
+├── server/          # Node.js backend / API routes
+├── shared/          # Shared TypeScript types & schemas
 ├── drizzle.config.ts
 ├── tailwind.config.ts
 ├── vite.config.ts
-└── package.json
+└── tsconfig.json
 ```
 
 ---
 
-## ⚙️ Tech Stack
+## ⚙️ Getting Started
 
-* TypeScript
-* Vite
-* Tailwind CSS
-* Node.js
-* Drizzle ORM
-* OCR & Computer Vision modules
-* AI/ML driven prediction models
+### Prerequisites
+
+- Node.js v18+
+- PostgreSQL database
+- npm or yarn
+- WhatsApp Business API credentials (for emergency alerts)
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/uday-chavan/LabMate.git
+   cd LabMate
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Configure environment variables**
+
+   Create a `.env` file in the root:
+   ```env
+   DATABASE_URL=postgresql://user:password@localhost:5432/labmate
+   WHATSAPP_API_KEY=your_api_key
+   ```
+
+4. **Set up the database**
+   ```bash
+   npx drizzle-kit push
+   ```
+
+5. **Start the development server**
+   ```bash
+   npm run dev
+   ```
 
 ---
 
-## 🚀 Getting Started
+## 📦 Scripts
 
-### 1️⃣ Clone the Repository
-
-```bash
-git clone https://github.com/uday-chavan/LabMate.git
-cd LabMate
-```
-
-### 2️⃣ Install Dependencies
-
-```bash
-npm install
-```
-
-### 3️⃣ Run Development Server
-
-```bash
-npm run dev
-```
-
----
-
-## 🎯 Vision
-
-LabMate aims to become a **smart AI co-pilot for laboratories**, making chemical research:
-
-* Safer
-* Faster
-* More data-driven
-* Accessible to everyone
+| Command         | Description                              |
+|-----------------|------------------------------------------|
+| `npm run dev`   | Start development server (client + server) |
+| `npm run build` | Build for production                     |
+| `npm run start` | Start production server                  |
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome!
+Contributions, issues, and feature requests are welcome!
 
-```bash
-git checkout -b feature/YourFeature
-git commit -m "Add new feature"
-git push origin feature/YourFeature
-```
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/your-feature`)
+3. Commit your changes (`git commit -m 'Add some feature'`)
+4. Push to the branch (`git push origin feature/your-feature`)
+5. Open a Pull Request
 
-Open a Pull Request 🚀
+---
+
+## 👤 Author
+
+**Uday Chavan**
+- GitHub: [@uday-chavan](https://github.com/uday-chavan)
 
 ---
 
 ## 📄 License
 
-MIT License
-
----
-
-## 👨‍💻 Author
-
-**Uday Chavan**
-
-If you find this project useful, consider giving it a ⭐
+This project is open source. Feel free to use and adapt it for your own projects.
