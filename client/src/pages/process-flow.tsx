@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Download, RotateCw, Sparkles, GitBranch, Info } from "lucide-react";
 import mermaid from "mermaid";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { generateMermaidDiagram } from "@/lib/gemini";
 
 export default function BlockDiagram() {
   const [description, setDescription] = useState<string>("");
@@ -22,7 +23,6 @@ export default function BlockDiagram() {
       securityLevel: 'loose',
       flowchart: {
         useMaxWidth: true,
-        htmlLabels: true,
         curve: 'cardinal',
         nodeSpacing: 100,
         rankSpacing: 100,
@@ -45,20 +45,8 @@ export default function BlockDiagram() {
 
     setIsGenerating(true);
     try {
-      const response = await fetch('/api/generate-diagram', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ description: description.trim() }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to generate diagram');
-      }
-
-      const data = await response.json();
-      const { svg } = await mermaid.render('preview', data.diagram);
+      const diagramCode = await generateMermaidDiagram(description.trim());
+      const { svg } = await mermaid.render('preview', diagramCode);
       setSvgContent(svg);
 
       toast({

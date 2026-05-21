@@ -179,7 +179,7 @@ export default function ProcessPredictor() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Failed to get prediction. Please try again.
+                  {error instanceof Error ? error.message : "Failed to get prediction. Please try again."}
                 </p>
               </CardContent>
             </Card>
@@ -227,7 +227,7 @@ export default function ProcessPredictor() {
                       return (
                         <motion.div
                           key={i}
-                          className="result-section"
+                          className="result-section space-y-2"
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ 
@@ -236,7 +236,6 @@ export default function ProcessPredictor() {
                             type: "spring",
                             damping: 15
                           }}
-                          className="space-y-2"
                         >
                           {lines.map((line, j) => (
                             <motion.p
@@ -248,7 +247,8 @@ export default function ProcessPredictor() {
                                 stiffness: 120,
                                 damping: 14,
                                 mass: 0.8,
-                                delay: 0.4 + (i * 0.4) + (j * 0.2) // Increased delay for smoother line animation
+                                delay: 0.2 + (i * 0.1) // Fixed small delay instead of scaling with j
+
                               }}
                               className="leading-relaxed text-foreground/80 font-normal"
                             >

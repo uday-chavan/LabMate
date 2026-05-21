@@ -7,6 +7,8 @@ import { z } from "zod";
 import { sendTelegramAlert } from './telegram';
 import { generateMermaidDiagram } from "../client/src/lib/gemini";
 import estimateProperties from "./api/estimate-properties";
+import papersRouter from "./api/papers";
+import { callGemini } from "./lib/gemini-keys";
 
 const router = Router();
 
@@ -16,6 +18,9 @@ router.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Mount the estimate-properties routes
 router.use('/api/estimate-properties', estimateProperties);
+
+// Mount the papers search route
+router.use('/api/papers', papersRouter);
 
 // Image Analysis endpoint
 router.post('/api/analyze-image', async (req, res) => {
@@ -32,9 +37,7 @@ router.post('/api/analyze-image', async (req, res) => {
       ? "You are a chemical safety expert. Analyze this chemical label image. Return ONLY the following format, no other text:\nName: [chemical name]\nHazards:\n- [hazard 1]\n- [hazard 2]\nPrecautions:\n- [precaution 1]\n- [precaution 2]"
       : "You are a lab equipment expert. Analyze this equipment image. Return ONLY the following format, no other text:\nName: [equipment name]\nDescription: [brief description]\nUsage: [usage instructions]\nMaintenance: [maintenance details]";
 
-    console.log('Starting Gemini API request...');
-
-    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
+    console.log('Starting Gemini API request (with key rotation)...');
 
     const requestBody = {
       contents: [{
@@ -52,26 +55,11 @@ router.post('/api/analyze-image', async (req, res) => {
         temperature: 0.1,
         topK: 16,
         topP: 0.8,
-        maxOutputTokens: 1024,
+        maxOutputTokens: 4096,
       }
     };
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(requestBody)
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Gemini API error:', errorText);
-      throw new Error(`Gemini API error: ${errorText}`);
-    }
-
-    const data = await response.json();
-    console.log('Gemini API response:', JSON.stringify(data, null, 2));
+    const data = await callGemini(requestBody);
 
     if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
       throw new Error("Invalid response format from Gemini API");

@@ -1,12 +1,57 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI("AIzaSyBWyvtUF-LNMb0QSj4IRH-MJCrpKi4kJ8Q");
-const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+// ─── Client-side key rotation ─────────────────────────────────────────────────
+// Keys are tried in order. On a quota / rate-limit error the next key is used.
+const GEMINI_KEYS: string[] = [
+  "AIzaSyCGq0qrMqMIuFUQ156k3WY_pg41jZkLLMw", // KEY_1
+  "AIzaSyBTHtJMEUHbEc1gt_NNLhF8UeLvi9706T4", // KEY_2
+  "AIzaSyBkDVhV0bq3geQyaJQDt1MuJT7Qk_hHSJA", // KEY_3
+  "AIzaSyCWUAiXrWB6GoMmyr5b72RuptDWF3PLHt0", // KEY_4
+  "AIzaSyDpzsohDGw__JXiDJEecztle3KKt-jHwJo", // KEY_5
+].filter(Boolean);
+
+const genAI = new GoogleGenerativeAI(GEMINI_KEYS[0]);
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+const GEMINI_BASE =
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+
+/** Retry statuses that indicate a key problem (not a request problem). */
+function isKeyError(status: number) {
+  return status === 401 || status === 403 || status === 429 || status === 503;
+}
+
+/** POST to Gemini with automatic key fallback. Returns parsed JSON data. */
+async function callWithKeyRotation(body: object): Promise<any> {
+  let lastError = "";
+  for (const key of GEMINI_KEYS) {
+    const url = `${GEMINI_BASE}?key=${key}`;
+    let res: Response;
+    try {
+      res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+    } catch (netErr: any) {
+      lastError = netErr.message;
+      continue; // network error — try next key
+    }
+
+    if (res.ok) return res.json();
+
+    lastError = `HTTP ${res.status}`;
+    if (isKeyError(res.status)) continue; // quota / auth — try next key
+
+    // Bad request or other non-key error — fail immediately
+    const errText = await res.text().catch(() => res.statusText);
+    throw new Error(`API error: ${errText}`);
+  }
+  throw new Error(`All API key's limit exhausted.`);
+}
 
 export async function predictProcess(query: string): Promise<string> {
   try {
-    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${genAI.apiKey}`;
-
     const prompt = `As a chemistry expert, provide a comprehensive analysis of this process/reaction query. Start with a clear, concise one-line answer, then provide a detailed explanation.
 
 Use these professional symbols only at the start of points, not in between text:
@@ -30,53 +75,19 @@ Detailed Explanation:
 Query: ${query}`;
 
     const requestBody = {
-      contents: [{
-        parts: [{ text: prompt }]
-      }],
-      generationConfig: {
-        temperature: 0.8,
-        topK: 32,
-        topP: 0.9,
-        maxOutputTokens: 1024,
-      },
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.8, topK: 32, topP: 0.9, maxOutputTokens: 4096 },
       safetySettings: [
-        {
-          category: "HARM_CATEGORY_HARASSMENT",
-          threshold: "BLOCK_MEDIUM_AND_ABOVE"
-        },
-        {
-          category: "HARM_CATEGORY_HATE_SPEECH",
-          threshold: "BLOCK_MEDIUM_AND_ABOVE"
-        },
-        {
-          category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-          threshold: "BLOCK_MEDIUM_AND_ABOVE"
-        },
-        {
-          category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-          threshold: "BLOCK_MEDIUM_AND_ABOVE"
-        }
-      ]
+        { category: "HARM_CATEGORY_HARASSMENT",        threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+        { category: "HARM_CATEGORY_HATE_SPEECH",        threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+        { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",  threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+        { category: "HARM_CATEGORY_DANGEROUS_CONTENT",  threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+      ],
     };
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(requestBody)
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Gemini API error response:', errorText);
-      throw new Error(`Gemini API error: ${errorText}`);
-    }
-
-    const data = await response.json();
+    const data = await callWithKeyRotation(requestBody);
 
     if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
-      console.error('Invalid Gemini API response format:', data);
       throw new Error("Invalid response format from Gemini API");
     }
 
@@ -90,8 +101,6 @@ Query: ${query}`;
 
 export async function analyzeImage(imageBase64: string, type: 'equipment' | 'chemical', mode?: 'safety'): Promise<string> {
   try {
-    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${genAI.apiKey}`;
-
     // Remove data URL prefix if present
     const base64Data = imageBase64.replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
     console.log('Processing image analysis request...');
@@ -133,70 +142,32 @@ Keep all text plain without any formatting or emphasis. Use natural, clear langu
       contents: [{
         parts: [
           { text: prompt },
-          {
-            inline_data: {
-              mime_type: "image/jpeg",
-              data: base64Data
-            }
-          }
-        ]
+          { inline_data: { mime_type: "image/jpeg", data: base64Data } },
+        ],
       }],
-      generationConfig: {
-        temperature: 0.4,
-        topK: 32,
-        topP: 0.95,
-        maxOutputTokens: 1024,
-      },
+      generationConfig: { temperature: 0.4, topK: 32, topP: 0.95, maxOutputTokens: 4096 },
       safetySettings: [
-        {
-          category: "HARM_CATEGORY_HARASSMENT",
-          threshold: "BLOCK_MEDIUM_AND_ABOVE"
-        },
-        {
-          category: "HARM_CATEGORY_HATE_SPEECH",
-          threshold: "BLOCK_MEDIUM_AND_ABOVE"
-        },
-        {
-          category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-          threshold: "BLOCK_MEDIUM_AND_ABOVE"
-        },
-        {
-          category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-          threshold: "BLOCK_MEDIUM_AND_ABOVE"
-        }
-      ]
+        { category: "HARM_CATEGORY_HARASSMENT",        threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+        { category: "HARM_CATEGORY_HATE_SPEECH",        threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+        { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",  threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+        { category: "HARM_CATEGORY_DANGEROUS_CONTENT",  threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+      ],
     };
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(requestBody)
-    });
+    const data = await callWithKeyRotation(requestBody);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Gemini API error response:', errorText);
-      throw new Error(`Gemini API error: ${errorText}`);
+    const parts = data.candidates?.[0]?.content?.parts;
+    if (!parts || parts.length === 0 || !parts[0].text) {
+      throw new Error("Invalid response format from API");
     }
 
-    const data = await response.json();
-    console.log('Raw Gemini API response:', JSON.stringify(data, null, 2));
-
-    if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
-      console.error('Invalid Gemini API response format:', data);
-      throw new Error("Invalid response format from Gemini API");
-    }
-
-    const analysisText = data.candidates[0].content.parts[0].text;
+    const analysisText = parts.map((p: any) => p.text).join("");
     console.log('Successfully parsed analysis text:', analysisText);
     return analysisText;
 
   } catch (error: any) {
     console.error('Error during image analysis:', error);
-    const errorMessage = error.message || "Unknown error occurred";
-    throw new Error(`Image analysis failed: ${errorMessage}`);
+    throw new Error(`Image analysis failed: ${error.message || "Unknown error"}`);
   }
 }
 
@@ -234,8 +205,6 @@ Please provide your analysis in the following format:
 
 export async function generateMermaidDiagram(description: string): Promise<string> {
   try {
-    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${genAI.apiKey}`;
-
     const prompt = `As a diagram expert, convert this process description into a Mermaid.js flowchart diagram code. Follow these specific formatting rules:
 
 1. Use 'graph LR' (left-to-right) layout
@@ -243,57 +212,53 @@ export async function generateMermaidDiagram(description: string): Promise<strin
 3. Arrange only 2-4 blocks per horizontal level
 4. Use subgraphs if needed to organize complex processes
 5. Style blocks with meaningful shapes:
-   - [Square] for processes
-   - (Rounded) for inputs/outputs
-   - {Diamond} for decisions
-   - ((Circle)) for start/end points
+   - ["Square"] for processes (ALWAYS use double quotes for text inside shapes)
+   - ("Rounded") for inputs/outputs
+   - {"Diamond"} for decisions
+   - (("Circle")) for start/end points
 6. Keep arrow labels short and clear
+7. CRITICAL: ALL text inside shapes MUST be wrapped in double quotes to prevent syntax errors! (e.g., A["Process Name"])
 
 Output ONLY the Mermaid.js diagram code, no explanations. Example format:
 
 graph LR
-  A((Start)) --> B[Process 1]
-  B --> C[Process 2]
-  C --> D{Decision}
-  D -->|Yes| E[Action 1]
-  D -->|No| F[Action 2]
+  A(("Start")) --> B["Process 1"]
+  B --> C["Process 2"]
+  C --> D{"Decision"}
+  D -->|Yes| E["Action 1"]
+  D -->|No| F["Action 2"]
 
 Description: ${description}`;
 
     const requestBody = {
-      contents: [{
-        parts: [{ text: prompt }]
-      }],
-      generationConfig: {
-        temperature: 0.3,
-        topK: 16,
-        topP: 0.8,
-        maxOutputTokens: 1024,
-      }
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.3, topK: 16, topP: 0.8, maxOutputTokens: 4096 },
     };
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(requestBody)
-    });
+    const data = await callWithKeyRotation(requestBody);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Gemini API error response:', errorText);
-      throw new Error(`Gemini API error: ${errorText}`);
+    const parts = data.candidates?.[0]?.content?.parts;
+    if (!parts || parts.length === 0 || !parts[0].text) {
+      throw new Error("Invalid response format from API");
     }
 
-    const data = await response.json();
-
-    if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
-      console.error('Invalid Gemini API response format:', data);
-      throw new Error("Invalid response format from Gemini API");
+    let rawCode = parts.map((p: any) => p.text).join("").trim();
+    
+    // Strip markdown code block wrappers if the AI adds them
+    if (rawCode.startsWith("```")) {
+      const lines = rawCode.split("\n");
+      if (lines[0].includes("mermaid")) {
+        lines.shift();
+      } else {
+        lines.shift(); // just strip the ``` line
+      }
+      if (lines[lines.length - 1] === "```") {
+        lines.pop();
+      }
+      rawCode = lines.join("\n").trim();
     }
-
-    return data.candidates[0].content.parts[0].text.trim();
+    
+    return rawCode;
 
   } catch (error: any) {
     console.error('Error generating Mermaid diagram:', error);
