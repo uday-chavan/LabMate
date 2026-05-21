@@ -1,23 +1,55 @@
-import { useState, useRef } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState, useRef, useEffect } from "react";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Camera, Upload, Loader2, Shield, AlertTriangle } from "lucide-react";
+import { Camera, Upload, Loader2, Shield, AlertTriangle, Bookmark, Save } from "lucide-react";
 import { analyzeImage } from "@/lib/gemini";
 import { useToast } from "@/hooks/use-toast";
 import { HazardMeter } from "@/components/hazard-meter";
+import { Link } from "wouter";
+
+let cachedSelectedFile: File | null = null;
+let cachedPreviewUrl: string | null = null;
+let cachedShowAnalysis = false;
+let cachedHazards: string[] = [];
 
 export default function Chemical() {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(cachedSelectedFile);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(cachedPreviewUrl);
   const [analyzing, setAnalyzing] = useState(false);
-  const [showAnalysis, setShowAnalysis] = useState(false);
-  const [hazards, setHazards] = useState<string[]>([]);
+  const [showAnalysis, setShowAnalysis] = useState(cachedShowAnalysis);
+  const [hazards, setHazards] = useState<string[]>(cachedHazards);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  useEffect(() => { cachedSelectedFile = selectedFile; }, [selectedFile]);
+  useEffect(() => { cachedPreviewUrl = previewUrl; }, [previewUrl]);
+  useEffect(() => { cachedShowAnalysis = showAnalysis; }, [showAnalysis]);
+  useEffect(() => { cachedHazards = hazards; }, [hazards]);
+
+  const saveMutation = useMutation({
+    mutationFn: async () => {
+      if (!analysis) throw new Error("No analysis available");
+      const chemicalName = analysis.split('\n')[0].trim();
+      const res = await fetch("/api/recent-searches", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "chemical",
+          query: chemicalName,
+          image: previewUrl,
+          result: analysis,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to save");
+      return res.json();
+    },
+    onSuccess: () => toast({ title: "Saved", description: "Chemical analysis saved to history." }),
+    onError: () => toast({ title: "Failed to save", description: "An error occurred.", variant: "destructive" })
+  });
 
   const handleFileSelect = (file: File) => {
     if (!file.type.startsWith('image/')) {
@@ -86,6 +118,7 @@ export default function Chemical() {
       }
     },
     enabled: false,
+    staleTime: 10 * 60 * 1000,
   });
 
   const startAnalysis = () => {
@@ -114,7 +147,13 @@ export default function Chemical() {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          {chemicalName}
+          <div className="flex items-center justify-center gap-4 px-4">
+            {chemicalName}
+            <Button variant="outline" size="sm" onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending}>
+              <Save className="w-4 h-4 mr-2" />
+              Save
+            </Button>
+          </div>
         </motion.h2>
 
         {/* Main Sections */}
@@ -222,9 +261,17 @@ export default function Chemical() {
         className="space-y-6 sm:space-y-8"
       >
         <div className="text-center space-y-3 sm:space-y-4">
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent px-2">
-            Chemical Label Scanner
-          </h1>
+          <div className="flex items-center justify-center gap-4">
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent px-2">
+              Chemical Label Scanner
+            </h1>
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/recent?type=chemical">
+                <Bookmark className="w-4 h-4 mr-2" />
+                Saved Chemicals
+              </Link>
+            </Button>
+          </div>
           <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto px-2">
             Upload or take a photo of any chemical label to get detailed safety information and analysis
           </p>

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,8 +16,11 @@ import {
   WifiOff,
   Database,
   Sparkles,
+  Save,
+  Bookmark,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "wouter";
 import { searchPapers, type Paper } from "@/lib/papers";
 import {
   Select,
@@ -56,41 +59,44 @@ function AISummary({ paper }: { paper: Paper }) {
       if (paper.authors) params.set("authors", paper.authors);
       if (paper.year)    params.set("year",    String(paper.year));
       const res = await fetch(`/api/papers/summarize?${params}`);
-      if (!res.ok) throw new Error("Failed to generate summary");
+      if (!res.ok) throw new Error("Failed to summarize");
       return res.json();
     },
-    staleTime: Infinity,   // cache forever for this session
-    retry: 1,
+    staleTime: 10 * 60 * 1000,
   });
 
   if (isLoading) {
     return (
-      <div className="flex items-center gap-2 text-sm text-muted-foreground py-2">
-        <Loader2 className="w-4 h-4 animate-spin shrink-0" />
-        <span>Generating AI overview…</span>
+      <div className="flex items-center gap-3 text-muted-foreground p-4 bg-muted/30 rounded-lg border border-primary/10 mt-4">
+        <Loader2 className="w-4 h-4 animate-spin text-primary" />
+        <span className="text-sm font-medium">Generating AI summary...</span>
       </div>
     );
   }
 
-  if (error || !data?.summary) {
+  if (error || !data) {
     return (
-      <p className="text-sm text-muted-foreground italic">
-        No abstract available for this paper. Visit the external link to read the full text.
-      </p>
+      <div className="flex items-center gap-2 text-destructive p-4 bg-destructive/10 rounded-lg mt-4">
+        <Info className="w-4 h-4" />
+        <span className="text-sm">Summary not available.</span>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-2">
-      <p className="flex items-center gap-1.5 text-xs text-primary/80 font-medium">
-        <Sparkles className="w-3.5 h-3.5" />
-        AI-generated overview
-      </p>
+    <div className="mt-4 p-5 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 rounded-xl border border-primary/20 shadow-sm relative overflow-hidden group">
+      <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+        <Sparkles className="w-12 h-12 text-primary" />
+      </div>
+      <div className="flex items-center gap-2 mb-3">
+        <Sparkles className="w-5 h-5 text-primary" />
+        <h4 className="font-semibold text-primary">AI Analysis</h4>
+      </div>
       <motion.div
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="text-sm leading-relaxed text-muted-foreground"
+        className="text-sm leading-relaxed text-muted-foreground prose prose-sm dark:prose-invert"
         dangerouslySetInnerHTML={{ __html: data.summary }}
       />
     </div>
@@ -99,12 +105,46 @@ function AISummary({ paper }: { paper: Paper }) {
 
 // ── Main component ─────────────────────────────────────────────────────────────
 export default function ResearchScraper() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [submittedQuery, setSubmittedQuery] = useState("");
-  const [filter, setFilter] = useState("all");
+  const [searchQuery, setSearchQuery] = useState(() => sessionStorage.getItem('rs-searchQuery') || "");
+  const [submittedQuery, setSubmittedQuery] = useState(() => sessionStorage.getItem('rs-submittedQuery') || "");
+  const [filter, setFilter] = useState(() => sessionStorage.getItem('rs-filter') || "all");
   const [selectedPaper, setSelectedPaper] = useState<string | null>(null);
   const [forceAIPaper, setForceAIPaper] = useState<string | null>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    sessionStorage.setItem('rs-searchQuery', searchQuery);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    sessionStorage.setItem('rs-submittedQuery', submittedQuery);
+  }, [submittedQuery]);
+
+  useEffect(() => {
+    sessionStorage.setItem('rs-filter', filter);
+  }, [filter]);
+
+  const saveMutation = useMutation({
+    mutationFn: async (paper: Paper) => {
+      const res = await fetch("/api/recent-searches", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "paper",
+          query: paper.title,
+          result: JSON.stringify(paper),
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to save paper");
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({ title: "Paper Saved", description: "This paper has been added to your saved list." });
+    },
+    onError: () => {
+      toast({ title: "Failed to save", description: "An error occurred while saving.", variant: "destructive" });
+    }
+  });
 
   const {
     data: papers,
@@ -161,10 +201,18 @@ export default function ResearchScraper() {
         animate={{ opacity: 1, y: 0 }}
         className="space-y-4"
       >
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-          <BookOpen className="w-8 h-8 text-primary" />
-          Research Papers
-        </h1>
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+            <BookOpen className="w-8 h-8 text-primary" />
+            Research Papers
+          </h1>
+          <Button variant="outline" asChild>
+            <Link href="/recent?type=paper">
+              <Bookmark className="w-4 h-4 mr-2" />
+              Saved Papers
+            </Link>
+          </Button>
+        </div>
         <p className="text-muted-foreground">
           Search and analyze research papers related to chemistry and chemical procedures.
         </p>
@@ -364,7 +412,16 @@ export default function ResearchScraper() {
                               </a>
                             </CardTitle>
                           </CardHeader>
-                          <CardContent className="flex justify-end">
+                          <CardContent className="flex justify-end gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => saveMutation.mutate(paper)}
+                              disabled={saveMutation.isPending}
+                            >
+                              <Save className="w-4 h-4 mr-2" />
+                              Save
+                            </Button>
                             <Button
                               variant="outline"
                               size="sm"

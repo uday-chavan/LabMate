@@ -6,6 +6,8 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  displayName: text("display_name"),
+  avatarUrl: text("avatar_url"),
   role: text("role").notNull().default("user"),
 });
 
@@ -40,6 +42,16 @@ export const papers = pgTable("papers", {
   cached: boolean("cached").default(false),
 });
 
+export const recentSearches = pgTable("recent_searches", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  type: text("type").notNull(), // 'chemical', 'equipment', 'diagram', 'process', 'paper'
+  query: text("query"),
+  image: text("image"), // Store heavily compressed base64 images to save DB size
+  result: text("result").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export const insertUserSchema = createInsertSchema(users);
 export const insertEmergencyAlertSchema = createInsertSchema(emergencyAlerts).omit({ id: true });
 export const insertEquipmentRecordSchema = createInsertSchema(equipmentRecords).omit({ id: true });
@@ -51,6 +63,7 @@ export type EmergencyAlert = typeof emergencyAlerts.$inferSelect;
 export type EquipmentRecord = typeof equipmentRecords.$inferSelect;
 export type ChemicalRecord = typeof chemicalRecords.$inferSelect;
 export type Paper = typeof papers.$inferSelect;
+export type RecentSearch = typeof recentSearches.$inferSelect;
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type InsertEmergencyAlert = z.infer<typeof insertEmergencyAlertSchema>;

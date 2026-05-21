@@ -3,12 +3,15 @@ import express, { type Request, Response, NextFunction } from "express";
 
 import { setupServer } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { setupAuth } from "./auth";
 
 const app = express();
 
 // Configure middleware with proper limits and CORS
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+setupAuth(app);
 
 // Add CORS headers
 app.use((req, res, next) => {

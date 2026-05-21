@@ -1,11 +1,12 @@
-import { useState, useRef } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState, useRef, useEffect } from "react";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Camera, Upload, RotateCw, Info, Search, Shield } from "lucide-react";
+import { Camera, Upload, RotateCw, Info, Search, Shield, Bookmark, Save } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { analyzeImage } from "@/lib/gemini";
+import { Link } from "wouter";
 
 type EquipmentDetails = {
   name: string;
@@ -20,14 +21,43 @@ interface EquipmentRecord {
   imageUrl: string | null;
 }
 
+let cachedSelectedFile: File | null = null;
+let cachedPreviewUrl: string | null = null;
+let cachedShowSafety = false;
+
 export default function EquipmentAnalyzer() {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(cachedSelectedFile);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(cachedPreviewUrl);
   const [analyzing, setAnalyzing] = useState(false);
-  const [showSafety, setShowSafety] = useState(false);
+  const [showSafety, setShowSafety] = useState(cachedShowSafety);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Sync to module-level cache
+  useEffect(() => { cachedSelectedFile = selectedFile; }, [selectedFile]);
+  useEffect(() => { cachedPreviewUrl = previewUrl; }, [previewUrl]);
+  useEffect(() => { cachedShowSafety = showSafety; }, [showSafety]);
+
+  const saveMutation = useMutation({
+    mutationFn: async () => {
+      if (!equipment || equipment.name === "Analyzing...") throw new Error("No equipment analyzed");
+      const res = await fetch("/api/recent-searches", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "equipment",
+          query: equipment.details.name,
+          image: previewUrl,
+          result: `Name: ${equipment.details.name}\n\nDescription: ${equipment.details.description}\n\nSafety Guidelines:\n${equipment.details.safetyGuidelines || 'Not analyzed yet'}`,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to save");
+      return res.json();
+    },
+    onSuccess: () => toast({ title: "Saved", description: "Equipment analysis saved to history." }),
+    onError: () => toast({ title: "Failed to save", description: "An error occurred.", variant: "destructive" })
+  });
 
   const handleGetSafety = async () => {
     if (!previewUrl || !equipment) {
@@ -173,15 +203,24 @@ export default function EquipmentAnalyzer() {
       };
     },
     enabled: false,
+    staleTime: 10 * 60 * 1000,
   });
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
       <header className="space-y-4">
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-          <Camera className="w-8 h-8 text-primary" />
-          Equipment Analyzer
-        </h1>
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+            <Camera className="w-8 h-8 text-primary" />
+            Equipment Analyzer
+          </h1>
+          <Button variant="outline" asChild>
+            <Link href="/recent?type=equipment">
+              <Bookmark className="w-4 h-4 mr-2" />
+              Saved Equipment
+            </Link>
+          </Button>
+        </div>
         <p className="text-muted-foreground">
           Take a photo or upload an image of lab equipment to analyze it.
         </p>
@@ -297,11 +336,15 @@ export default function EquipmentAnalyzer() {
               exit={{ opacity: 0, x: -20 }}
             >
               <Card>
-                <CardHeader>
+                <CardHeader className="flex flex-row justify-between items-center pb-2">
                   <CardTitle className="flex items-center gap-2">
                     <Info className="w-5 h-5 text-primary" />
                     {equipment.name}
                   </CardTitle>
+                  <Button variant="outline" size="sm" onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending || equipment.name === "Analyzing..."}>
+                    <Save className="w-4 h-4 mr-2" />
+                    Save
+                  </Button>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <motion.p

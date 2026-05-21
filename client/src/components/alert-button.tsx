@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function AlertButton() {
   const [sending, setSending] = useState(false);
@@ -21,6 +22,7 @@ export default function AlertButton() {
   const [isOpen, setIsOpen] = useState(false);
   const [isLocationOpen, setIsLocationOpen] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleSaveLocation = () => {
     if (location.trim()) {
@@ -47,8 +49,11 @@ export default function AlertButton() {
         second: 'numeric'
       });
 
+      const senderName = user?.displayName || user?.username || "Unknown User";
+
       await sendAlert(
         `🚨 EMERGENCY ALERT 🚨\n\n` +
+        `Sender: ${senderName}\n` +
         `Message: Emergency situation reported\n` +
         `Location: ${location || "Not specified"}\n` +
         `Time: ${timestamp}\n\n` +
@@ -75,45 +80,6 @@ export default function AlertButton() {
 
   return (
     <div className="flex items-center gap-2">
-      {/* Location Dialog */}
-      <Dialog open={isLocationOpen} onOpenChange={setIsLocationOpen}>
-        <DialogTrigger asChild>
-          <Button 
-            variant="outline" 
-            size="icon"
-            className="bg-background hover:bg-background"
-          >
-            <MapPin className="h-5 w-5 text-primary" />
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Set Location</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="location">Current Location</Label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="location"
-                  placeholder="Enter your location"
-                  className="pl-9"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                />
-              </div>
-            </div>
-            <Button
-              onClick={handleSaveLocation}
-              className="w-full"
-            >
-              Save Location
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
       {/* Emergency Alert Dialog */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
@@ -174,6 +140,45 @@ export default function AlertButton() {
                 </motion.button>
               </div>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Location Dialog */}
+      <Dialog open={isLocationOpen} onOpenChange={setIsLocationOpen}>
+        <DialogTrigger asChild>
+          <Button 
+            variant="outline" 
+            size="icon"
+            className="bg-background hover:bg-background"
+          >
+            <MapPin className="h-5 w-5 text-primary" />
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Set Location</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="location">Current Location</Label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="location"
+                  placeholder="Enter your location"
+                  className="pl-9"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                />
+              </div>
+            </div>
+            <Button
+              onClick={handleSaveLocation}
+              className="w-full"
+            >
+              Save Location
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

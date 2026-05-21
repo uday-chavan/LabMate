@@ -99,7 +99,7 @@ export async function callGemini(body: GeminiRequest): Promise<GeminiResponse> {
     );
     const waitMs = soonest.cooledDownUntil - Date.now();
     throw new Error(
-      `All Gemini API keys are temporarily rate-limited. Please wait ~${Math.ceil(waitMs / 1000)}s and try again.`
+      `All API keys are temporarily rate-limited. Please wait ~${Math.ceil(waitMs / 1000)}s and try again.`
     );
   }
 

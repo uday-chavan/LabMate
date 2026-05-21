@@ -1,20 +1,49 @@
 import { useState, useRef, useEffect } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
-import { Download, RotateCw, Sparkles, GitBranch, Info } from "lucide-react";
+import { Download, RotateCw, Sparkles, GitBranch, Info, Bookmark, Save } from "lucide-react";
 import mermaid from "mermaid";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { generateMermaidDiagram } from "@/lib/gemini";
+import { Link } from "wouter";
 
 export default function BlockDiagram() {
-  const [description, setDescription] = useState<string>("");
+  const [description, setDescription] = useState<string>(() => sessionStorage.getItem('diagram-desc') || "");
   const [svgContent, setSvgContent] = useState<string>("");
+  const [diagramCode, setDiagramCode] = useState<string>(() => sessionStorage.getItem('diagram-code') || "");
   const [isGenerating, setIsGenerating] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    sessionStorage.setItem('diagram-desc', description);
+  }, [description]);
+
+  useEffect(() => {
+    sessionStorage.setItem('diagram-code', diagramCode);
+  }, [diagramCode]);
+
+  const saveMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch("/api/recent-searches", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "diagram",
+          query: description,
+          result: diagramCode,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to save");
+      return res.json();
+    },
+    onSuccess: () => toast({ title: "Saved", description: "Diagram saved to your history." }),
+    onError: () => toast({ title: "Failed to save", description: "An error occurred.", variant: "destructive" })
+  });
 
   useEffect(() => {
     mermaid.initialize({
@@ -31,6 +60,12 @@ export default function BlockDiagram() {
         fontSize: 20,
       }
     });
+
+    if (diagramCode && !svgContent) {
+      mermaid.render('preview-cached', diagramCode).then(({ svg }) => {
+        setSvgContent(svg);
+      }).catch(console.error);
+    }
   }, []);
 
   const generateDiagram = async () => {
@@ -45,8 +80,9 @@ export default function BlockDiagram() {
 
     setIsGenerating(true);
     try {
-      const diagramCode = await generateMermaidDiagram(description.trim());
-      const { svg } = await mermaid.render('preview', diagramCode);
+      const code = await generateMermaidDiagram(description.trim());
+      setDiagramCode(code);
+      const { svg } = await mermaid.render('preview', code);
       setSvgContent(svg);
 
       toast({
@@ -92,10 +128,18 @@ export default function BlockDiagram() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, type: "spring" }}
         >
-          <div className="relative">
-            <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-              Block Diagram Generator
-            </h1>
+          <div className="relative inline-flex flex-col items-center">
+            <div className="flex items-center gap-4 justify-center">
+              <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                Block Diagram Generator
+              </h1>
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/recent?type=diagram">
+                  <Bookmark className="w-4 h-4 mr-2" />
+                  Saved Diagrams
+                </Link>
+              </Button>
+            </div>
             <motion.div
               className="absolute -top-6 -right-6 text-primary/10"
               animate={{
@@ -211,20 +255,31 @@ Step 13: Final Compounding & Processing with additives.`);
                   <CardHeader>
                     <CardTitle className="text-lg flex justify-between items-center">
                       Generated Block Diagram
-                      <motion.div
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={downloadSVG}
-                          className="group"
-                        >
-                          <Download className="w-4 h-4 mr-2 transition-transform group-hover:scale-110" />
-                          Download SVG
-                        </Button>
-                      </motion.div>
+                      <div className="flex gap-2">
+                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => saveMutation.mutate()}
+                            disabled={saveMutation.isPending || !diagramCode}
+                            className="group"
+                          >
+                            <Save className="w-4 h-4 mr-2 transition-transform group-hover:scale-110" />
+                            Save
+                          </Button>
+                        </motion.div>
+                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={downloadSVG}
+                            className="group"
+                          >
+                            <Download className="w-4 h-4 mr-2 transition-transform group-hover:scale-110" />
+                            Download SVG
+                          </Button>
+                        </motion.div>
+                      </div>
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="h-[calc(100%-4rem)]">

@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, Beaker, AlertCircle, Info } from "lucide-react";
+import { Loader2, Beaker, AlertCircle, Info, Bookmark, Save } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { predictProcess } from "@/lib/gemini";
+import { Link } from "wouter";
 
 const EXAMPLE_QUERIES = [
   {
@@ -37,14 +38,42 @@ const EXAMPLE_QUERIES = [
 ];
 
 export default function ProcessPredictor() {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(() => sessionStorage.getItem('process-query') || "");
+  const [hasPredicted, setHasPredicted] = useState(() => sessionStorage.getItem('process-hasPredicted') === 'true');
   const { toast } = useToast();
   const resultsRef = useRef(null);
+
+  useEffect(() => {
+    sessionStorage.setItem('process-query', query);
+  }, [query]);
+
+  useEffect(() => {
+    sessionStorage.setItem('process-hasPredicted', String(hasPredicted));
+  }, [hasPredicted]);
+
+  const saveMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch("/api/recent-searches", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "process",
+          query,
+          result: prediction,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to save");
+      return res.json();
+    },
+    onSuccess: () => toast({ title: "Saved", description: "Prediction saved to your history." }),
+    onError: () => toast({ title: "Failed to save", description: "An error occurred.", variant: "destructive" })
+  });
 
   const { data: prediction, isLoading, error, refetch } = useQuery({
     queryKey: ['prediction', query],
     queryFn: () => predictProcess(query),
-    enabled: false,
+    enabled: !!query && hasPredicted,
+    staleTime: 10 * 60 * 1000, // 10 minutes
   });
 
   const handlePredict = async () => {
@@ -56,6 +85,7 @@ export default function ProcessPredictor() {
       });
       return;
     }
+    setHasPredicted(true);
     refetch();
   };
 
@@ -79,10 +109,18 @@ export default function ProcessPredictor() {
         animate={{ opacity: 1, y: 0 }}
         className="space-y-4"
       >
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-          <Beaker className="w-8 h-8 text-primary" />
-          Process Predictor
-        </h1>
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+            <Beaker className="w-8 h-8 text-primary" />
+            Process Predictor
+          </h1>
+          <Button variant="outline" asChild>
+            <Link href="/recent?type=process">
+              <Bookmark className="w-4 h-4 mr-2" />
+              Saved Processes
+            </Link>
+          </Button>
+        </div>
         <p className="text-muted-foreground">
           Describe a chemical process or reaction and get AI-powered predictions and explanations.
         </p>
@@ -194,8 +232,12 @@ export default function ProcessPredictor() {
             transition={{ duration: 0.8 }}
           >
             <Card>
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle>Analysis Results</CardTitle>
+                <Button variant="outline" size="sm" onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending}>
+                  <Save className="w-4 h-4 mr-2" />
+                  Save
+                </Button>
               </CardHeader>
               <CardContent>
                 <ScrollArea className="h-[500px] rounded-md border p-6" id="results-scroll-area">

@@ -1,5 +1,6 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,10 +18,14 @@ import {
   Hexagon,
   Waves,
   ArrowBigDown,
-  Shapes
+  Shapes,
+  Bookmark,
+  Save
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { predictProcess } from "@/lib/gemini";
+import { Link } from "wouter";
+import { useToast } from "@/hooks/use-toast";
 
 type PropertyData = {
   title: string;
@@ -47,12 +52,40 @@ const propertyIcons = {
   Ionization: ArrowBigDown
 };
 
+let cachedSmiles = "";
+let cachedProperties: PropertyData[] = [];
+let cachedMainTitle = "";
+
 export default function PropertyEstimation() {
-  const [smiles, setSmiles] = useState("");
-  const [properties, setProperties] = useState<PropertyData[]>([]);
-  const [mainTitle, setMainTitle] = useState<string>("");
+  const [smiles, setSmiles] = useState(cachedSmiles);
+  const [properties, setProperties] = useState<PropertyData[]>(cachedProperties);
+  const [mainTitle, setMainTitle] = useState<string>(cachedMainTitle);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  useEffect(() => { cachedSmiles = smiles; }, [smiles]);
+  useEffect(() => { cachedProperties = properties; }, [properties]);
+  useEffect(() => { cachedMainTitle = mainTitle; }, [mainTitle]);
+
+  const saveMutation = useMutation({
+    mutationFn: async () => {
+      if (!mainTitle || properties.length === 0) throw new Error("No properties to save");
+      const res = await fetch("/api/recent-searches", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "smiles",
+          query: smiles,
+          result: JSON.stringify({ title: mainTitle, properties }),
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to save");
+      return res.json();
+    },
+    onSuccess: () => toast({ title: "Saved", description: "SMILES properties saved to history." }),
+    onError: () => toast({ title: "Failed to save", description: "An error occurred.", variant: "destructive" })
+  });
 
   const handleEstimate = async () => {
     setLoading(true);
@@ -122,12 +155,20 @@ SMILES: ${smiles}`;
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="space-y-2"
+        className="space-y-4"
       >
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-          <FlaskConical className="w-8 h-8 text-primary" />
-          Physical Property Estimation
-        </h1>
+        <div className="flex justify-between items-center w-full">
+          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+            <FlaskConical className="w-8 h-8 text-primary" />
+            Physical Property Estimation
+          </h1>
+          <Button variant="outline" asChild>
+            <Link href="/recent?type=smiles">
+              <Bookmark className="w-4 h-4 mr-2" />
+              Saved SMILES
+            </Link>
+          </Button>
+        </div>
         <p className="text-muted-foreground">
           Enter a SMILES notation to discover chemical properties
         </p>
@@ -197,9 +238,13 @@ SMILES: ${smiles}`;
             <motion.h2
               initial={{ y: 20 }}
               animate={{ y: 0 }}
-              className="text-4xl font-bold bg-gradient-to-r from-primary via-primary/50 to-primary bg-clip-text text-transparent animate-pulse"
+              className="text-4xl font-bold bg-gradient-to-r from-primary via-primary/50 to-primary bg-clip-text text-transparent flex items-center justify-center gap-4"
             >
               {mainTitle}
+              <Button variant="outline" size="sm" onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending}>
+                <Save className="w-4 h-4 mr-2 text-foreground" />
+                <span className="text-foreground">Save</span>
+              </Button>
             </motion.h2>
           </motion.div>
         )}
