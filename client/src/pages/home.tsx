@@ -106,11 +106,11 @@ export default function Home() {
       }}
       className="relative space-y-8 md:space-y-12 px-4 py-8 md:py-12 overflow-hidden"
     >
-      {/* Left side gradient animation */}
-      <div className="absolute left-0 top-0 h-full w-1/4 bg-gradient-to-r from-blue-400/20 via-sky-300/10 to-transparent animate-pulse-slow pointer-events-none"></div>
+      {/* Left side gradient */}
+      <div className="absolute left-0 top-0 h-full w-1/4 bg-gradient-to-r from-blue-400/20 via-sky-300/10 to-transparent pointer-events-none"></div>
 
-      {/* Right side gradient animation */}
-      <div className="absolute right-0 top-0 h-full w-1/4 bg-gradient-to-l from-orange-400/20 via-amber-300/10 to-transparent animate-pulse-slow pointer-events-none"></div>
+      {/* Right side gradient */}
+      <div className="absolute right-0 top-0 h-full w-1/4 bg-gradient-to-l from-orange-400/20 via-amber-300/10 to-transparent pointer-events-none"></div>
 
       <motion.header
         initial={{ opacity: 0, y: -20 }}
