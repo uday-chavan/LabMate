@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { Beaker, User as UserIcon, Lock } from "lucide-react";
+import { User as UserIcon, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/use-auth";
@@ -38,7 +38,7 @@ export default function IntroPage() {
           transition={{ type: "spring", stiffness: 260, damping: 20, duration: 0.8 }}
           className="flex justify-center"
         >
-          <Beaker className="w-24 h-24 text-primary" />
+          <img src="/logo.png" alt="LabMate Logo" className="w-24 h-24 object-contain rounded-2xl shadow-xl border border-primary/10" />
         </motion.div>
 
         <motion.div

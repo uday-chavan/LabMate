@@ -39,7 +39,7 @@ export default function AlertButton() {
 
     setSending(true);
     try {
-      const timestamp = new Date().toLocaleString('en-US', { 
+      const timestamp = new Date().toLocaleString('en-US', {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
@@ -147,8 +147,8 @@ export default function AlertButton() {
       {/* Location Dialog */}
       <Dialog open={isLocationOpen} onOpenChange={setIsLocationOpen}>
         <DialogTrigger asChild>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             size="icon"
             className="bg-background hover:bg-background"
           >

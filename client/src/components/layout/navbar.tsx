@@ -165,8 +165,7 @@ export default function Navbar() {
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-4">
           <Link href="/home" className="flex items-center gap-2">
-            <Beaker className="h-6 w-6 text-primary" />
-            <span className="font-bold hidden md:inline-block">LabMate</span>
+            <img src="/logo.png" alt="LabMate Logo" className="h-10 w-10 object-contain rounded-md" />
           </Link>
         </div>
 
@@ -186,12 +185,12 @@ export default function Navbar() {
           </NavigationMenuList>
         </NavigationMenu>
 
-        <div className="ml-auto flex items-center gap-4">
+        <div className="ml-auto flex items-center gap-2 md:gap-4">
           <AlertButton />
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-10 w-10 mr-4 rounded-full border border-black overflow-hidden p-0">
+              <Button variant="ghost" className="relative h-10 w-10 mr-1 md:mr-4 rounded-full border border-black overflow-hidden p-0">
                 <Avatar className="h-full w-full">
                   <AvatarImage src={user?.avatarUrl || ""} alt={user?.displayName || user?.username} className="object-cover" />
                   <AvatarFallback className="bg-primary/10 text-primary">
