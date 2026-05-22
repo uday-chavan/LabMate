@@ -142,14 +142,14 @@ export default function Chemical() {
       >
         {/* Chemical Name */}
         <motion.h2 
-          className="text-3xl md:text-4xl font-bold text-center bg-gradient-to-r from-primary/80 to-primary bg-clip-text text-transparent px-4"
+          className="text-2xl md:text-4xl font-bold text-center bg-gradient-to-r from-primary/80 to-primary bg-clip-text text-transparent px-4"
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="flex items-center justify-center gap-4 px-4">
-            {chemicalName}
-            <Button variant="outline" size="sm" onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending}>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 px-4">
+            <span className="break-words max-w-full text-center">{chemicalName}</span>
+            <Button variant="outline" size="sm" onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending} className="shrink-0">
               <Save className="w-4 h-4 mr-2" />
               Save
             </Button>
@@ -261,14 +261,14 @@ export default function Chemical() {
         className="space-y-6 sm:space-y-8"
       >
         <div className="text-center space-y-3 sm:space-y-4">
-          <div className="flex items-center justify-center gap-4">
-            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent px-2">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent px-2 whitespace-nowrap">
               Chemical Label Scanner
             </h1>
             <Button variant="outline" size="sm" asChild>
               <Link href="/recent?type=chemical">
                 <Bookmark className="w-4 h-4 mr-2" />
-                Saved Chemicals
+                Saved
               </Link>
             </Button>
           </div>

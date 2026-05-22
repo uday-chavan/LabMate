@@ -4,17 +4,17 @@ import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  Beaker, 
-  Atom, 
-  Thermometer, 
-  Scale, 
-  Droplet, 
-  Zap, 
-  Cloud, 
-  FlaskConical, 
-  AlertTriangle, 
-  Gauge, 
+import {
+  Beaker,
+  Atom,
+  Thermometer,
+  Scale,
+  Droplet,
+  Zap,
+  Cloud,
+  FlaskConical,
+  AlertTriangle,
+  Gauge,
   Hexagon,
   Waves,
   ArrowBigDown,
@@ -157,15 +157,15 @@ SMILES: ${smiles}`;
         animate={{ opacity: 1, y: 0 }}
         className="space-y-4"
       >
-        <div className="flex justify-between items-center w-full">
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-            <FlaskConical className="w-8 h-8 text-primary" />
-            Physical Property Estimation
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-center">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight flex flex-wrap justify-center items-center gap-2">
+            <FlaskConical className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+            Physical Property Estimator
           </h1>
-          <Button variant="outline" asChild>
+          <Button variant="outline" size="sm" asChild>
             <Link href="/recent?type=smiles">
               <Bookmark className="w-4 h-4 mr-2" />
-              Saved SMILES
+              Saved
             </Link>
           </Button>
         </div>
@@ -182,8 +182,8 @@ SMILES: ${smiles}`;
             placeholder="Enter SMILES notation (e.g., CCO for ethanol)"
             className="flex-1"
           />
-          <Button 
-            onClick={handleEstimate} 
+          <Button
+            onClick={handleEstimate}
             disabled={loading || !smiles}
             className="min-w-[120px]"
           >
@@ -195,7 +195,7 @@ SMILES: ${smiles}`;
             ) : "Estimate"}
           </Button>
         </div>
-        
+
         <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
           <h3 className="text-sm font-medium mb-2 flex items-center gap-2">
             <FlaskConical className="w-4 h-4 text-primary" />
@@ -238,10 +238,10 @@ SMILES: ${smiles}`;
             <motion.h2
               initial={{ y: 20 }}
               animate={{ y: 0 }}
-              className="text-4xl font-bold bg-gradient-to-r from-primary via-primary/50 to-primary bg-clip-text text-transparent flex items-center justify-center gap-4"
+              className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-primary via-primary/50 to-primary bg-clip-text text-transparent flex flex-col sm:flex-row items-center justify-center gap-4"
             >
-              {mainTitle}
-              <Button variant="outline" size="sm" onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending}>
+              <span className="break-words text-center max-w-full px-2">{mainTitle}</span>
+              <Button variant="outline" size="sm" onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending} className="shrink-0">
                 <Save className="w-4 h-4 mr-2 text-foreground" />
                 <span className="text-foreground">Save</span>
               </Button>
@@ -263,29 +263,29 @@ SMILES: ${smiles}`;
               return (
                 <motion.div
                   key={prop.title}
-                  initial={{ 
-                    opacity: 0, 
+                  initial={{
+                    opacity: 0,
                     scale: randomScale,
                     rotate: randomRotation,
                     y: 50
                   }}
-                  animate={{ 
-                    opacity: 1, 
+                  animate={{
+                    opacity: 1,
                     scale: 1,
                     rotate: 0,
                     y: 0,
-                    transition: { 
+                    transition: {
                       type: "spring",
                       stiffness: 100,
                       damping: 15,
-                      delay: index * 0.1 
+                      delay: index * 0.1
                     }
                   }}
                   exit={{ opacity: 0, scale: 0.8 }}
-                  whileHover={{ 
-                    scale: 1.05, 
+                  whileHover={{
+                    scale: 1.05,
                     rotate: randomRotation / 2,
-                    transition: { duration: 0.2 } 
+                    transition: { duration: 0.2 }
                   }}
                 >
                   <Card className="overflow-hidden bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 hover:shadow-lg transition-all duration-300">

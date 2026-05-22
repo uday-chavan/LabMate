@@ -221,8 +221,8 @@ export default function ResearchScraper() {
       {/* ── Search Card ──────────────────────────────────────────────────────── */}
       <Card className="overflow-hidden bg-gradient-to-br from-background to-background/80 border-2 hover:border-primary/50 transition-all duration-300">
         <CardContent className="pt-6 space-y-6">
-          <div className="flex gap-4">
-            <div className="flex-1">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1 w-full">
               <Input
                 placeholder="Search for research papers..."
                 value={searchQuery}
@@ -231,29 +231,31 @@ export default function ResearchScraper() {
                 className="w-full"
               />
             </div>
-            <Select value={filter} onValueChange={setFilter}>
-              <SelectTrigger className="w-[180px]">
-                <Filter className="w-4 h-4 mr-2" />
-                <SelectValue placeholder="Filter by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Papers</SelectItem>
-                <SelectItem value="recent">Last Year</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button onClick={handleSearch} disabled={isWorking} className="min-w-[120px]">
-              {isWorking ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Searching...
-                </>
-              ) : (
-                <>
-                  <Search className="mr-2 h-4 w-4" />
-                  Search
-                </>
-              )}
-            </Button>
+            <div className="flex gap-4 w-full md:w-auto">
+              <Select value={filter} onValueChange={setFilter}>
+                <SelectTrigger className="w-full md:w-[180px]">
+                  <Filter className="w-4 h-4 mr-2" />
+                  <SelectValue placeholder="Filter by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Papers</SelectItem>
+                  <SelectItem value="recent">Last Year</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button onClick={handleSearch} disabled={isWorking} className="flex-1 md:min-w-[120px]">
+                {isWorking ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Searching...
+                  </>
+                ) : (
+                  <>
+                    <Search className="mr-2 h-4 w-4" />
+                    Search
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
 
           <div className="space-y-4">
@@ -284,7 +286,7 @@ export default function ResearchScraper() {
       </Card>
 
       {/* ── Results Area ─────────────────────────────────────────────────────── */}
-      <div className="flex gap-6 relative min-h-[600px]">
+      <div className="flex flex-col md:flex-row gap-6 relative min-h-[600px]">
         {/* Paper list */}
         <div className="flex-1 min-w-0">
           <AnimatePresence mode="wait">
@@ -372,7 +374,7 @@ export default function ResearchScraper() {
                   {filteredPapers.length} paper{filteredPapers.length !== 1 ? "s" : ""} found
                 </p>
                 <ScrollArea className="h-[600px]">
-                  <div className="space-y-4 pr-4">
+                  <div className="space-y-4 px-1 sm:px-0 sm:pr-4 pb-4">
                     {filteredPapers.map((paper, index) => (
                       <motion.div
                         key={paper.id}
@@ -446,17 +448,26 @@ export default function ResearchScraper() {
           </AnimatePresence>
         </div>
 
-        {/* Abstract side panel — slides in from the right */}
+        {/* Abstract side panel — slides in from the right on desktop, popup on mobile */}
         <AnimatePresence>
           {selectedPaper && selectedPaperData && (
-            <motion.div
-              initial={{ opacity: 0, x: 100, width: 0 }}
-              animate={{ opacity: 1, x: 0, width: "40%" }}
-              exit={{ opacity: 0, x: 100, width: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="bg-card rounded-lg border shadow-lg p-6 relative shrink-0"
-              style={{ minWidth: 0 }}
-            >
+            <>
+              {/* Mobile Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setSelectedPaper(null)}
+                className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden"
+              />
+              <motion.div
+                initial={window.innerWidth < 768 ? { opacity: 0, y: 50 } : { opacity: 0, x: 100, width: 0 }}
+                animate={window.innerWidth < 768 ? { opacity: 1, y: 0 } : { opacity: 1, x: 0, width: "40%" }}
+                exit={window.innerWidth < 768 ? { opacity: 0, y: 50 } : { opacity: 0, x: 100, width: 0 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="bg-card rounded-lg border shadow-lg p-6 fixed inset-4 z-50 md:relative md:inset-auto md:z-0 md:shrink-0 flex flex-col h-[calc(100vh-2rem)] md:h-auto overflow-hidden"
+                style={{ minWidth: 0 }}
+              >
               {/* Close button */}
               <motion.button
                 initial={{ opacity: 0 }}
@@ -507,6 +518,7 @@ export default function ResearchScraper() {
                 </ScrollArea>
               </motion.div>
             </motion.div>
+            </>
           )}
         </AnimatePresence>
       </div>

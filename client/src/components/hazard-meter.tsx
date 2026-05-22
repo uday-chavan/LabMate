@@ -61,7 +61,7 @@ export function HazardMeter({ hazards }: HazardMeterProps) {
   };
 
   return (
-    <div className="relative w-56 h-44">
+    <div className="relative w-56 h-44 mb-8">
       {/* Background Circle */}
       <svg
         viewBox="0 0 200 120"

@@ -129,14 +129,14 @@ export default function BlockDiagram() {
           transition={{ duration: 0.5, type: "spring" }}
         >
           <div className="relative inline-flex flex-col items-center">
-            <div className="flex items-center gap-4 justify-center">
-              <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                 Block Diagram Generator
               </h1>
               <Button variant="outline" size="sm" asChild>
                 <Link href="/recent?type=diagram">
                   <Bookmark className="w-4 h-4 mr-2" />
-                  Saved Diagrams
+                  Saved
                 </Link>
               </Button>
             </div>
@@ -262,10 +262,10 @@ Step 13: Final Compounding & Processing with additives.`);
                             size="sm"
                             onClick={() => saveMutation.mutate()}
                             disabled={saveMutation.isPending || !diagramCode}
-                            className="group"
+                            className="group px-2 sm:px-3"
                           >
-                            <Save className="w-4 h-4 mr-2 transition-transform group-hover:scale-110" />
-                            Save
+                            <Save className="w-4 h-4 sm:mr-2 transition-transform group-hover:scale-110" />
+                            <span className="hidden sm:inline">Save</span>
                           </Button>
                         </motion.div>
                         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -273,10 +273,10 @@ Step 13: Final Compounding & Processing with additives.`);
                             variant="outline"
                             size="sm"
                             onClick={downloadSVG}
-                            className="group"
+                            className="group px-2 sm:px-3"
                           >
-                            <Download className="w-4 h-4 mr-2 transition-transform group-hover:scale-110" />
-                            Download SVG
+                            <Download className="w-4 h-4 sm:mr-2 transition-transform group-hover:scale-110" />
+                            <span className="hidden sm:inline">Download SVG</span>
                           </Button>
                         </motion.div>
                       </div>
@@ -287,18 +287,12 @@ Step 13: Final Compounding & Processing with additives.`);
                       initial={{ scale: 0.95, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       transition={{ duration: 0.5, type: "spring" }}
-                      className="h-[600px] flex items-center justify-center bg-white rounded-lg p-8 shadow-inner overflow-hidden"
+                      className="h-[400px] md:h-[600px] flex items-center justify-center bg-white rounded-lg p-2 sm:p-8 shadow-inner overflow-auto"
                     >
                       <div
                         ref={previewRef}
-                        className="w-full h-full transform scale-150 transition-transform duration-300"
+                        className="min-w-full h-full flex items-center justify-center [&>svg]:max-w-full [&>svg]:h-auto"
                         dangerouslySetInnerHTML={{ __html: svgContent }}
-                        style={{
-                          minHeight: "500px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center"
-                        }}
                       />
                     </motion.div>
                   </CardContent>

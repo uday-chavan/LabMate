@@ -126,8 +126,8 @@ export default function Home() {
           emergency notification system.
         </p>
         {/* Animation positioned below the heading */}
-        <div className="flex justify-center items-center gap-2 text-2xl font-medium mt-6 mb-8">
-          <span>LabMate can</span>
+        <div className="flex flex-wrap justify-center items-center gap-1 sm:gap-2 text-lg sm:text-xl md:text-2xl font-medium mt-6 mb-8">
+          <span className="whitespace-nowrap">LabMate can</span>
           <TypeAnimation
             phrases={[
               "Predict or Explain Any Process 💡",
