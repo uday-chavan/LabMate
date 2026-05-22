@@ -262,13 +262,14 @@ export default function Chemical() {
       >
         <div className="text-center space-y-3 sm:space-y-4">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent px-2 whitespace-nowrap">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent px-2 whitespace-nowrap sm:whitespace-normal">
               Chemical Label Scanner
             </h1>
-            <Button variant="outline" size="sm" asChild>
+            <Button variant="outline" size="sm" asChild className="w-full sm:w-auto">
               <Link href="/recent?type=chemical">
                 <Bookmark className="w-4 h-4 mr-2" />
-                Saved
+                <span className="sm:hidden">Saved</span>
+                <span className="hidden sm:inline">Saved Chemicals</span>
               </Link>
             </Button>
           </div>
@@ -377,10 +378,11 @@ export default function Chemical() {
           </Card>
 
           {/* Hazard Meter Section */}
-          <div className="md:col-span-2 flex justify-center items-center">
+          <div className="md:col-span-2 flex justify-center items-center h-full">
             <AnimatePresence mode="wait">
               {showAnalysis && hazards.length > 0 ? (
                 <motion.div
+                  key="result"
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
@@ -390,15 +392,28 @@ export default function Chemical() {
                 </motion.div>
               ) : analyzing ? (
                 <motion.div
+                  key="analyzing"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="text-center text-muted-foreground"
+                  className="text-center text-muted-foreground w-full h-full min-h-[250px] flex flex-col justify-center items-center border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-lg bg-gray-50/30 dark:bg-gray-900/30"
                 >
-                  <Loader2 className="w-12 h-12 animate-spin mx-auto mb-2" />
+                  <Loader2 className="w-12 h-12 animate-spin mx-auto mb-2 text-primary/60" />
                   <p>Analyzing hazard level...</p>
                 </motion.div>
-              ) : null}
+              ) : (
+                <motion.div
+                  key="empty"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="text-center text-muted-foreground w-full h-full min-h-[250px] flex flex-col items-center justify-center border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-lg p-6 bg-gray-50/30 dark:bg-gray-900/30"
+                >
+                  <img src="/placeholder.png" alt="Safety Analysis Placeholder" className="w-32 h-32 mb-4 object-contain opacity-70" />
+                  <h3 className="font-medium text-foreground/70 mb-2">Safety Analysis</h3>
+                  <p className="text-sm max-w-[200px]">Upload a chemical label to see its hazard rating and safety guidelines here.</p>
+                </motion.div>
+              )}
             </AnimatePresence>
           </div>
         </div>

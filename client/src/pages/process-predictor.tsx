@@ -109,15 +109,16 @@ export default function ProcessPredictor() {
         animate={{ opacity: 1, y: 0 }}
         className="space-y-4"
       >
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-            <Beaker className="w-8 h-8 text-primary" />
+        <div className="flex flex-col sm:flex-row items-center sm:justify-between w-full gap-4 text-center sm:text-left">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight flex flex-wrap justify-center sm:justify-start items-center gap-2">
+            <Beaker className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
             Process Predictor
           </h1>
-          <Button variant="outline" asChild>
+          <Button variant="outline" size="sm" asChild className="w-full sm:w-auto">
             <Link href="/recent?type=process">
               <Bookmark className="w-4 h-4 mr-2" />
-              Saved Processes
+              <span className="sm:hidden">Saved</span>
+              <span className="hidden sm:inline">Saved Processes</span>
             </Link>
           </Button>
         </div>

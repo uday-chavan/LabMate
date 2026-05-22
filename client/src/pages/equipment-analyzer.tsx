@@ -207,17 +207,18 @@ export default function EquipmentAnalyzer() {
   });
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-8">
-      <header className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-            <Camera className="w-8 h-8 text-primary" />
+    <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
+      <header className="space-y-2 sm:space-y-4">
+        <div className="flex flex-col sm:flex-row items-center sm:justify-between w-full gap-4 text-center sm:text-left">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight flex flex-wrap justify-center sm:justify-start items-center gap-2">
+            <Camera className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
             Equipment Analyzer
           </h1>
-          <Button variant="outline" asChild>
+          <Button variant="outline" size="sm" asChild className="w-full sm:w-auto">
             <Link href="/recent?type=equipment">
               <Bookmark className="w-4 h-4 mr-2" />
-              Saved Equipment
+              <span className="sm:hidden">Saved</span>
+              <span className="hidden sm:inline">Saved Equipment</span>
             </Link>
           </Button>
         </div>
@@ -226,11 +227,11 @@ export default function EquipmentAnalyzer() {
         </p>
       </header>
 
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid md:grid-cols-2 gap-6">
         <div className="space-y-4">
           <Card>
             <CardContent className="pt-6">
-              <div className="aspect-square rounded-lg border-2 border-dashed flex items-center justify-center relative">
+              <div className="h-[250px] sm:h-[300px] w-full rounded-lg border-2 border-dashed flex items-center justify-center relative overflow-hidden">
                 <AnimatePresence>
                   {previewUrl ? (
                     <motion.img
@@ -323,7 +324,7 @@ export default function EquipmentAnalyzer() {
               exit={{ opacity: 0 }}
             >
               <Card>
-                <CardContent className="pt-6 flex justify-center items-center min-h-[400px]">
+                <CardContent className="pt-6 flex justify-center items-center min-h-[300px]">
                   <RotateCw className="w-8 h-8 animate-spin text-primary" />
                 </CardContent>
               </Card>
@@ -411,7 +412,19 @@ export default function EquipmentAnalyzer() {
                 </CardContent>
               </Card>
             </motion.div>
-          ) : null}
+          ) : (
+            <motion.div
+              key="empty"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="text-center text-muted-foreground w-full h-full min-h-[300px] flex flex-col items-center justify-center border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-lg p-6 bg-gray-50/30 dark:bg-gray-900/30"
+            >
+              <img src="/placeholder.png" alt="Equipment Analysis Placeholder" className="w-40 h-40 mb-4 object-contain opacity-70" />
+              <h3 className="font-medium text-foreground/70 mb-2">Equipment Analysis</h3>
+              <p className="text-sm max-w-[250px] mx-auto">Upload or take a photo of lab equipment to see its details and safety guidelines here.</p>
+            </motion.div>
+          )}
         </AnimatePresence>
       </div>
     </div>

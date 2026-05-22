@@ -201,15 +201,16 @@ export default function ResearchScraper() {
         animate={{ opacity: 1, y: 0 }}
         className="space-y-4"
       >
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-            <BookOpen className="w-8 h-8 text-primary" />
+        <div className="flex flex-col sm:flex-row items-center sm:justify-between w-full gap-4 text-center sm:text-left">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight flex flex-wrap justify-center sm:justify-start items-center gap-2">
+            <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
             Research Papers
           </h1>
-          <Button variant="outline" asChild>
+          <Button variant="outline" size="sm" asChild className="w-full sm:w-auto">
             <Link href="/recent?type=paper">
               <Bookmark className="w-4 h-4 mr-2" />
-              Saved Papers
+              <span className="sm:hidden">Saved</span>
+              <span className="hidden sm:inline">Saved Papers</span>
             </Link>
           </Button>
         </div>
@@ -374,7 +375,7 @@ export default function ResearchScraper() {
                   {filteredPapers.length} paper{filteredPapers.length !== 1 ? "s" : ""} found
                 </p>
                 <ScrollArea className="h-[600px]">
-                  <div className="space-y-4 px-1 sm:px-0 sm:pr-4 pb-4">
+                  <div className="space-y-4 px-2 pr-4 sm:px-0 sm:pr-4 pb-4">
                     {filteredPapers.map((paper, index) => (
                       <motion.div
                         key={paper.id}
@@ -382,19 +383,19 @@ export default function ResearchScraper() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.08 }}
                       >
-                        <Card className="hover:shadow-lg transition-all duration-300">
+                        <Card className="hover:shadow-lg transition-all duration-300 overflow-hidden">
                           <CardHeader>
                             <CardTitle className="flex justify-between items-start gap-3">
-                              <div className="space-y-1">
+                              <div className="space-y-1 min-w-0 flex-1">
                                   <span 
                                     className="text-lg font-medium leading-snug block" 
                                     dangerouslySetInnerHTML={{ __html: paper.title }} 
                                   />
                                 {(paper.year || paper.authors) && (
-                                  <div className="flex flex-wrap gap-3 text-xs text-muted-foreground font-normal">
+                                  <div className="flex flex-wrap gap-2 text-xs text-muted-foreground font-normal">
                                     {paper.year && <span>📅 {paper.year}</span>}
                                     {paper.authors && (
-                                      <span className="truncate max-w-[260px]">
+                                      <span className="truncate max-w-[200px] sm:max-w-[260px]">
                                         👤 {paper.authors}
                                       </span>
                                     )}
@@ -414,15 +415,16 @@ export default function ResearchScraper() {
                               </a>
                             </CardTitle>
                           </CardHeader>
-                          <CardContent className="flex justify-end gap-2">
+                          <CardContent className="flex flex-wrap justify-end gap-2">
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => saveMutation.mutate(paper)}
                               disabled={saveMutation.isPending}
                             >
-                              <Save className="w-4 h-4 mr-2" />
-                              Save
+                              <Save className="w-4 h-4 mr-1 sm:mr-2" />
+                              <span className="sm:hidden">Save</span>
+                              <span className="hidden sm:inline">Save</span>
                             </Button>
                             <Button
                               variant="outline"
@@ -435,7 +437,8 @@ export default function ResearchScraper() {
                               }}
                               className="text-sm"
                             >
-                              {selectedPaper === paper.id ? "Hide Abstract" : "Show Abstract"}
+                              <span className="sm:hidden">{selectedPaper === paper.id ? "Hide" : "Abstract"}</span>
+                              <span className="hidden sm:inline">{selectedPaper === paper.id ? "Hide Abstract" : "Show Abstract"}</span>
                             </Button>
                           </CardContent>
                         </Card>

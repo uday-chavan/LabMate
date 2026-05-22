@@ -116,11 +116,11 @@ export default function BlockDiagram() {
   };
 
   return (
-    <div className="container px-4 py-6 max-w-7xl mx-auto">
+    <div className="container px-4 py-4 max-w-7xl mx-auto">
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="space-y-8"
+        className="space-y-4 sm:space-y-6"
       >
         <motion.div
           className="text-center space-y-3"
@@ -133,27 +133,14 @@ export default function BlockDiagram() {
               <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                 Block Diagram Generator
               </h1>
-              <Button variant="outline" size="sm" asChild>
+              <Button variant="outline" size="sm" asChild className="w-full sm:w-auto">
                 <Link href="/recent?type=diagram">
                   <Bookmark className="w-4 h-4 mr-2" />
-                  Saved
+                  <span className="sm:hidden">Saved</span>
+                  <span className="hidden sm:inline">Saved Diagrams</span>
                 </Link>
               </Button>
             </div>
-            <motion.div
-              className="absolute -top-6 -right-6 text-primary/10"
-              animate={{
-                rotate: [0, 360],
-                scale: [1, 1.1, 1]
-              }}
-              transition={{
-                duration: 10,
-                repeat: Infinity,
-                repeatType: "reverse"
-              }}
-            >
-              <GitBranch className="w-12 h-12" />
-            </motion.div>
           </div>
           <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
             Describe your process in natural language and let AI create a block diagram
@@ -210,7 +197,7 @@ Step 13: Final Compounding & Processing with additives.`);
                 <Textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="min-h-[300px] text-base relative bg-background/80 backdrop-blur-sm transition-all duration-300 focus:bg-background"
+                  className="min-h-[200px] md:min-h-[250px] text-base relative bg-background/80 backdrop-blur-sm transition-all duration-300 focus:bg-background"
                   placeholder="Describe your process in natural language..."
                 />
                 <motion.div

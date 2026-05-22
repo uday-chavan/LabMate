@@ -29,6 +29,7 @@ export default defineConfig({
     },
   },
   root: path.resolve(__dirname, "client"),
+  publicDir: path.resolve(__dirname, "public"),
   server: {
     port: 3000,
     host: true, // Listen on all addresses
