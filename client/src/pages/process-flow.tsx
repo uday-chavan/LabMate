@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
-import { Download, RotateCw, Sparkles, GitBranch, Info, Bookmark, Save } from "lucide-react";
+import { Download, RotateCw, Sparkles, GitBranch, Info, Bookmark, Save, ArrowLeft } from "lucide-react";
 import mermaid from "mermaid";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { generateMermaidDiagram } from "@/lib/gemini";
@@ -130,9 +130,16 @@ export default function BlockDiagram() {
         >
           <div className="relative inline-flex flex-col items-center">
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                Block Diagram Generator
-              </h1>
+              <div className="flex items-center justify-center sm:justify-start gap-3 w-full sm:w-auto">
+                <Button variant="outline" size="icon" asChild className="h-9 w-9 shrink-0">
+                  <Link href="/home">
+                    <ArrowLeft className="w-5 h-5" />
+                  </Link>
+                </Button>
+                <h1 className="text-xl sm:text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent text-center sm:text-left py-1">
+                  Block Diagram Generator
+                </h1>
+              </div>
               <Button variant="outline" size="sm" asChild className="w-full sm:w-auto">
                 <Link href="/recent?type=diagram">
                   <Bookmark className="w-4 h-4 mr-2" />

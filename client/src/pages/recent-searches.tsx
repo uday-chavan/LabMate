@@ -2,13 +2,13 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { RecentSearch } from "@shared/schema";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Download, Image as ImageIcon, FileText, Share2, ExternalLink, Hexagon, Trash2, Loader2 } from "lucide-react";
+import { Clock, Download, Image as ImageIcon, FileText, Share2, ExternalLink, Hexagon, Trash2, Loader2, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatDistanceToNow } from "date-fns";
 import mermaid from "mermaid";
 import { useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 
@@ -52,8 +52,8 @@ function DiagramPreview({ code, id }: { code: string; id: number }) {
 
   return (
     <div className="space-y-4">
-      <div 
-        ref={containerRef} 
+      <div
+        ref={containerRef}
         className="w-full min-h-[300px] bg-card border rounded-lg p-4 flex items-center justify-center overflow-auto shadow-inner"
       />
       <Button variant="outline" onClick={handleDownload} className="w-full">
@@ -113,13 +113,55 @@ export default function RecentSearches() {
 
   const titlePrefix = typeFilter ? (typeFilter.charAt(0).toUpperCase() + typeFilter.slice(1)) + " " : "Recent ";
 
+  const getPageTitle = (type: string | null) => {
+    switch (type) {
+      case "process":
+        return "Saved Process Predictions";
+      case "diagram":
+        return "Saved Process Diagrams";
+      case "paper":
+        return "Saved Research Papers";
+      case "smiles":
+        return "Saved Physical Properties";
+      case "equipment":
+        return "Saved Equipment Analysis";
+      case "chemical":
+        return "Saved Chemical Analyses";
+      default:
+        return "Saved History";
+    }
+  };
+
+  const getBackLinkInfo = (type: string | null) => {
+    switch (type) {
+      case "process":
+        return { link: "/predict", label: "Process Predictor" };
+      case "diagram":
+        return { link: "/block-diagram", label: "Block Diagram Generator" };
+      case "paper":
+        return { link: "/research", label: "Research Papers" };
+      case "smiles":
+        return { link: "/property-estimation", label: "Property Estimator" };
+      case "equipment":
+        return { link: "/equipment", label: "Equipment Analyzer" };
+      case "chemical":
+        return { link: "/chemical", label: "Chemical Label Scanner" };
+      default:
+        return { link: "/home", label: "Home" };
+    }
+  };
+
+  const backInfo = getBackLinkInfo(typeFilter);
+
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-4xl mx-auto">
-      <div>
-        <h1 className="text-4xl font-bold tracking-tight mb-2">{titlePrefix}Searches</h1>
-        <p className="text-muted-foreground text-lg">
-          History of your AI analysis and diagram generations.
-        </p>
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-4xl mx-auto">
+      <div className="flex items-center gap-3">
+        <Button variant="outline" size="icon" asChild className="h-9 w-9 shrink-0">
+          <Link href={backInfo.link}>
+            <ArrowLeft className="w-5 h-5" />
+          </Link>
+        </Button>
+        <h1 className="text-2xl sm:text-4xl font-bold tracking-tight">{getPageTitle(typeFilter)}</h1>
       </div>
 
       {!searches || searches.length === 0 ? (
@@ -138,10 +180,10 @@ export default function RecentSearches() {
                 <div className="flex justify-between items-start gap-4">
                   <div className="min-w-0 flex-1">
                     <CardTitle className="flex items-center gap-2 text-xl">
-                      {search.type === 'diagram' ? <Share2 className="w-5 h-5 text-blue-500" /> : 
-                       search.type === 'paper' ? <FileText className="w-5 h-5 text-green-500" /> : 
-                       search.type === 'smiles' ? <Hexagon className="w-5 h-5 text-orange-500" /> : 
-                       <ImageIcon className="w-5 h-5 text-purple-500" />}
+                      {search.type === 'diagram' ? <Share2 className="w-5 h-5 text-blue-500" /> :
+                        search.type === 'paper' ? <FileText className="w-5 h-5 text-green-500" /> :
+                          search.type === 'smiles' ? <Hexagon className="w-5 h-5 text-orange-500" /> :
+                            <ImageIcon className="w-5 h-5 text-purple-500" />}
                       {search.type.charAt(0).toUpperCase() + search.type.slice(1)} Analysis
                     </CardTitle>
                     {search.query && (
@@ -157,9 +199,9 @@ export default function RecentSearches() {
                     </div>
                   </div>
                   <div className="flex flex-col items-end shrink-0">
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                       onClick={() => deleteMutation.mutate(search.id)}
                       disabled={deleteMutation.isPending}
@@ -246,9 +288,9 @@ export default function RecentSearches() {
                     {search.image && (
                       <div className="w-full md:w-1/3 shrink-0">
                         <div className="aspect-square relative rounded-lg overflow-hidden border shadow-sm">
-                          <img 
-                            src={search.image} 
-                            alt="Analyzed image" 
+                          <img
+                            src={search.image}
+                            alt="Analyzed image"
                             className="object-cover w-full h-full"
                           />
                         </div>

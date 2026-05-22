@@ -18,6 +18,7 @@ import {
   Sparkles,
   Save,
   Bookmark,
+  ArrowLeft,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "wouter";
@@ -202,10 +203,17 @@ export default function ResearchScraper() {
         className="space-y-4"
       >
         <div className="flex flex-col sm:flex-row items-center sm:justify-between w-full gap-4 text-center sm:text-left">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight flex flex-wrap justify-center sm:justify-start items-center gap-2">
-            <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
-            Research Papers
-          </h1>
+          <div className="flex items-center gap-3">
+            <Button variant="outline" size="icon" asChild className="h-9 w-9 shrink-0">
+              <Link href="/home">
+                <ArrowLeft className="w-5 h-5" />
+              </Link>
+            </Button>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight flex items-center gap-2">
+              <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-primary shrink-0" />
+              Research Papers
+            </h1>
+          </div>
           <Button variant="outline" size="sm" asChild className="w-full sm:w-auto">
             <Link href="/recent?type=paper">
               <Bookmark className="w-4 h-4 mr-2" />

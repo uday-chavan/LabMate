@@ -20,7 +20,8 @@ import {
   ArrowBigDown,
   Shapes,
   Bookmark,
-  Save
+  Save,
+  ArrowLeft
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { predictProcess } from "@/lib/gemini";
@@ -151,17 +152,23 @@ SMILES: ${smiles}`;
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-8">
+    <div className="max-w-6xl mx-auto p-4 sm:p-6 space-y-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="space-y-4"
       >
         <div className="flex flex-col sm:flex-row sm:justify-between items-center w-full gap-4 text-center sm:text-left">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight flex flex-wrap justify-center sm:justify-start items-center gap-2">
-            <FlaskConical className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
-            Physical Property Estimator
-          </h1>
+          <div className="flex items-center justify-center sm:justify-start gap-3 w-full sm:w-auto">
+            <Button variant="outline" size="icon" asChild className="h-9 w-9 shrink-0">
+              <Link href="/home">
+                <ArrowLeft className="w-5 h-5" />
+              </Link>
+            </Button>
+            <h1 className="text-xl sm:text-3xl md:text-4xl font-bold tracking-tight text-center sm:text-left">
+              Physical Property Estimator
+            </h1>
+          </div>
           <Button variant="outline" size="sm" asChild className="w-full sm:w-auto">
             <Link href="/recent?type=smiles">
               <Bookmark className="w-4 h-4 mr-2" />
@@ -170,7 +177,7 @@ SMILES: ${smiles}`;
             </Link>
           </Button>
         </div>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground text-center sm:text-left">
           Enter a SMILES notation to discover chemical properties
         </p>
       </motion.div>

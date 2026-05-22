@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Camera, Upload, Loader2, Info, Search, Shield, Bookmark, Save } from "lucide-react";
+import { Camera, Upload, Loader2, Info, Search, Shield, Bookmark, Save, ArrowLeft } from "lucide-react";
 import { analyzeImage } from "@/lib/gemini";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
@@ -378,9 +378,16 @@ export default function EquipmentAnalyzer() {
       >
         <div className="text-center space-y-3 sm:space-y-4">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent px-2 whitespace-nowrap sm:whitespace-normal">
-              Equipment Analyzer
-            </h1>
+            <div className="flex items-center gap-3">
+              <Button variant="outline" size="icon" asChild className="h-9 w-9 shrink-0">
+                <Link href="/home">
+                  <ArrowLeft className="w-5 h-5" />
+                </Link>
+              </Button>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent px-2 whitespace-nowrap sm:whitespace-normal py-1">
+                Equipment Analyzer
+              </h1>
+            </div>
             <Button variant="outline" size="sm" asChild className="w-full sm:w-auto">
               <Link href="/recent?type=equipment">
                 <Bookmark className="w-4 h-4 mr-2" />
@@ -537,7 +544,7 @@ export default function EquipmentAnalyzer() {
                   exit={{ opacity: 0 }}
                   className="text-center text-muted-foreground w-full h-full min-h-[250px] flex flex-col items-center justify-center border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-lg p-6 bg-gray-50/30 dark:bg-gray-900/30 w-full"
                 >
-                  <img src="/placeholder.png" alt="Equipment Analysis Placeholder" className="w-32 h-32 mb-4 object-contain opacity-70" />
+                  <img src="/hazardous lab equipment.webp" alt="Equipment Analysis Placeholder" className="w-32 h-32 mb-4 object-cover rounded-2xl opacity-90 border shadow-sm" />
                   <h3 className="font-medium text-foreground/70 mb-2">Equipment Analysis</h3>
                   <p className="text-sm max-w-[200px]">Upload or take a photo of lab equipment to see its details and safety guidelines here.</p>
                 </motion.div>

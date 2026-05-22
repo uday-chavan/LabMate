@@ -95,20 +95,20 @@ export default function IntroPage() {
           ) : (
             <div className="bg-card border shadow-2xl rounded-2xl overflow-hidden backdrop-blur-xl bg-opacity-80">
               <div className="flex border-b">
-                <button 
+                <button
                   className={`flex-1 py-4 text-sm font-semibold transition-colors ${authMode === 'login' ? 'bg-primary/10 text-primary border-b-2 border-primary' : 'text-muted-foreground hover:bg-muted'}`}
                   onClick={() => setAuthMode('login')}
                 >
                   Sign In
                 </button>
-                <button 
+                <button
                   className={`flex-1 py-4 text-sm font-semibold transition-colors ${authMode === 'register' ? 'bg-primary/10 text-primary border-b-2 border-primary' : 'text-muted-foreground hover:bg-muted'}`}
                   onClick={() => setAuthMode('register')}
                 >
                   Create Account
                 </button>
               </div>
-              
+
               <div className="p-6">
                 <form className="space-y-4" onSubmit={authMode === 'login' ? handleLogin : handleRegister}>
                   <div className="space-y-4 text-left">
@@ -137,10 +137,10 @@ export default function IntroPage() {
                       />
                     </div>
                   </div>
-                  
-                  <Button 
+
+                  <Button
                     type="submit"
-                    className="w-full h-11 text-base font-semibold shadow-md transition-all hover:shadow-lg" 
+                    className="w-full h-11 text-base font-semibold shadow-md transition-all hover:shadow-lg"
                     disabled={registerMutation.isPending || loginMutation.isPending || !username || !password}
                   >
                     {loginMutation.isPending || registerMutation.isPending ? (
@@ -159,9 +159,10 @@ export default function IntroPage() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 2, duration: 0.8 }}
-          className="mt-16 text-sm text-muted-foreground"
+          className="mt-16 text-sm text-muted-foreground space-y-1"
         >
-          Created By Uday Chavan
+          <div>Developed By Uday Chavan</div>
+          <div className="text-xs opacity-80">Guided by - Dr. P. S. Bhandari</div>
         </motion.div>
       </div>
 
