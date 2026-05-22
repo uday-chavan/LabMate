@@ -18,6 +18,7 @@ import BlockDiagram from "@/pages/process-flow";
 import PropertyEstimation from "@/pages/property-estimation";
 import Credits from "@/pages/credits"; 
 import RecentSearches from "@/pages/recent-searches";
+import { ProtectedRoute } from "@/lib/protected-route";
 
 function Router() {
   return (
@@ -31,15 +32,15 @@ function Router() {
               <main className="container mx-auto px-4 py-8">
                 <AnimatePresence mode="wait">
                   <Switch>
-                    <Route path="/home" component={Home} />
-                    <Route path="/predict" component={ProcessPredictor} />
-                    <Route path="/research" component={ResearchScraper} />
-                    <Route path="/equipment" component={EquipmentAnalyzer} />
-                    <Route path="/chemical" component={ChemicalSafetyAnalyzer} />
-                    <Route path="/block-diagram" component={BlockDiagram} />
-                    <Route path="/property-estimation" component={PropertyEstimation} />
-                    <Route path="/credits" component={Credits} />
-                    <Route path="/recent" component={RecentSearches} />
+                    <ProtectedRoute path="/home" component={Home} />
+                    <ProtectedRoute path="/predict" component={ProcessPredictor} />
+                    <ProtectedRoute path="/research" component={ResearchScraper} />
+                    <ProtectedRoute path="/equipment" component={EquipmentAnalyzer} />
+                    <ProtectedRoute path="/chemical" component={ChemicalSafetyAnalyzer} />
+                    <ProtectedRoute path="/block-diagram" component={BlockDiagram} />
+                    <ProtectedRoute path="/property-estimation" component={PropertyEstimation} />
+                    <ProtectedRoute path="/credits" component={Credits} />
+                    <ProtectedRoute path="/recent" component={RecentSearches} />
                     <Route component={NotFound} />
                   </Switch>
                 </AnimatePresence>
