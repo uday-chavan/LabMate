@@ -500,19 +500,19 @@ export default function ResearchScraper() {
                   {hasAbstract ? (
                     /* Real abstract */
                     <div>
-                      <div 
-                        className="text-sm leading-relaxed text-muted-foreground mb-4"
-                        dangerouslySetInnerHTML={{ __html: selectedPaperData.abstract }}
-                      />
                       <Button
                         variant="secondary"
                         size="sm"
-                        className="w-full text-xs flex items-center justify-center gap-2"
+                        className="w-full text-xs flex items-center justify-center gap-2 mb-4"
                         onClick={() => setForceAIPaper(selectedPaperData.id)}
                       >
                         <Sparkles className="w-3.5 h-3.5" />
                         Abstract looks messy? Generate AI Summary
                       </Button>
+                      <div 
+                        className="text-sm leading-relaxed text-muted-foreground mb-4"
+                        dangerouslySetInnerHTML={{ __html: selectedPaperData.abstract }}
+                      />
                     </div>
                   ) : (
                     /* No abstract → call Gemini lazily */

@@ -39,7 +39,7 @@ const EXAMPLE_QUERIES = [
 
 export default function ProcessPredictor() {
   const [query, setQuery] = useState(() => sessionStorage.getItem('process-query') || "");
-  const [hasPredicted, setHasPredicted] = useState(() => sessionStorage.getItem('process-hasPredicted') === 'true');
+  const [activeQuery, setActiveQuery] = useState(() => sessionStorage.getItem('process-activeQuery') || "");
   const { toast } = useToast();
   const resultsRef = useRef(null);
 
@@ -48,8 +48,8 @@ export default function ProcessPredictor() {
   }, [query]);
 
   useEffect(() => {
-    sessionStorage.setItem('process-hasPredicted', String(hasPredicted));
-  }, [hasPredicted]);
+    sessionStorage.setItem('process-activeQuery', activeQuery);
+  }, [activeQuery]);
 
   const saveMutation = useMutation({
     mutationFn: async () => {
@@ -58,7 +58,7 @@ export default function ProcessPredictor() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           type: "process",
-          query,
+          query: activeQuery,
           result: prediction,
         }),
       });
@@ -70,9 +70,9 @@ export default function ProcessPredictor() {
   });
 
   const { data: prediction, isLoading, error, refetch } = useQuery({
-    queryKey: ['prediction', query],
-    queryFn: () => predictProcess(query),
-    enabled: !!query && hasPredicted,
+    queryKey: ['prediction', activeQuery],
+    queryFn: () => predictProcess(activeQuery),
+    enabled: !!activeQuery,
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
 
@@ -85,8 +85,11 @@ export default function ProcessPredictor() {
       });
       return;
     }
-    setHasPredicted(true);
-    refetch();
+    if (activeQuery === query.trim()) {
+      refetch();
+    } else {
+      setActiveQuery(query.trim());
+    }
   };
 
   // Scroll to results when they appear
@@ -249,17 +252,16 @@ export default function ProcessPredictor() {
                         return (
                           <motion.div
                             key={i}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
                             transition={{
-                              duration: 0.8,
-                              delay: 0.2,
-                              type: "spring",
-                              stiffness: 100
+                              duration: 0.4,
+                              delay: 0.1,
+                              ease: "easeOut"
                             }}
                             className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-4 rounded-lg"
                           >
-                            <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground/90 leading-tight">
+                            <h2 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-foreground/90 leading-tight">
                               {section}
                             </h2>
                           </motion.div>
@@ -271,32 +273,21 @@ export default function ProcessPredictor() {
                         <motion.div
                           key={i}
                           className="result-section space-y-2"
-                          initial={{ opacity: 0, y: 20 }}
+                          initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ 
-                            duration: 0.8, 
-                            delay: 0.3 + (i * 0.4),
-                            type: "spring",
-                            damping: 15
+                            duration: 0.4, 
+                            delay: 0.15 + (i * 0.1),
+                            ease: "easeOut"
                           }}
                         >
                           {lines.map((line, j) => (
-                            <motion.p
+                            <p
                               key={`${i}-${j}`}
-                              initial={{ opacity: 0, y: 15 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ 
-                                type: "spring",
-                                stiffness: 120,
-                                damping: 14,
-                                mass: 0.8,
-                                delay: 0.2 + (i * 0.1) // Fixed small delay instead of scaling with j
-
-                              }}
-                              className="leading-relaxed text-foreground/80 font-normal"
+                              className="leading-relaxed text-foreground/80 font-normal mb-2"
                             >
                               {line}
-                            </motion.p>
+                            </p>
                           ))}
                         </motion.div>
                       );

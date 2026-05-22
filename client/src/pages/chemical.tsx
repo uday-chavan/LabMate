@@ -140,21 +140,27 @@ export default function Chemical() {
         exit={{ opacity: 0, y: -20 }}
         className="space-y-8"
       >
-        {/* Chemical Name */}
-        <motion.h2 
-          className="text-2xl md:text-4xl font-bold text-center bg-gradient-to-r from-primary/80 to-primary bg-clip-text text-transparent px-4"
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 px-4">
+        {/* Chemical Name and Save Button Container */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 px-4">
+          <motion.h2 
+            className="text-2xl md:text-4xl font-bold text-center bg-gradient-to-r from-primary/80 to-primary bg-clip-text text-transparent"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
             <span className="break-words max-w-full text-center">{chemicalName}</span>
-            <Button variant="outline" size="sm" onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending} className="shrink-0">
-              <Save className="w-4 h-4 mr-2" />
-              Save
-            </Button>
-          </div>
-        </motion.h2>
+          </motion.h2>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => saveMutation.mutate()} 
+            disabled={saveMutation.isPending} 
+            className="shrink-0 border-primary/20 text-primary hover:bg-primary/10"
+          >
+            <Save className="w-4 h-4 mr-2 text-primary" />
+            Save
+          </Button>
+        </div>
 
         {/* Main Sections */}
         <motion.div 
@@ -378,7 +384,7 @@ export default function Chemical() {
           </Card>
 
           {/* Hazard Meter Section */}
-          <div className="md:col-span-2 flex justify-center items-center h-full">
+          <div className="md:col-span-2 flex justify-center items-center h-full pb-8 md:pb-0">
             <AnimatePresence mode="wait">
               {showAnalysis && hazards.length > 0 ? (
                 <motion.div
@@ -424,6 +430,7 @@ export default function Chemical() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
+              className="mt-6 sm:mt-10"
             >
               <Card className="p-4 sm:p-6 border-2 border-primary/20">
                 {renderAnalysis()}

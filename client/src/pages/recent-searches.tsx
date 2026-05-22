@@ -135,8 +135,8 @@ export default function RecentSearches() {
           {searches.map((search) => (
             <Card key={search.id} className="overflow-hidden transition-all hover:shadow-lg border-primary/10">
               <CardHeader className="bg-muted/30 pb-4">
-                <div className="flex justify-between items-start">
-                  <div>
+                <div className="flex justify-between items-start gap-4">
+                  <div className="min-w-0 flex-1">
                     <CardTitle className="flex items-center gap-2 text-xl">
                       {search.type === 'diagram' ? <Share2 className="w-5 h-5 text-blue-500" /> : 
                        search.type === 'paper' ? <FileText className="w-5 h-5 text-green-500" /> : 
@@ -145,12 +145,18 @@ export default function RecentSearches() {
                       {search.type.charAt(0).toUpperCase() + search.type.slice(1)} Analysis
                     </CardTitle>
                     {search.query && (
-                      <CardDescription className="mt-2 text-base font-medium line-clamp-2">
+                      <CardDescription className="mt-2 text-base font-medium break-all line-clamp-3">
                         {search.query}
                       </CardDescription>
                     )}
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <Badge variant="outline" className="flex items-center gap-1 text-xs py-0.5">
+                        <Clock className="w-3 h-3" />
+                        {formatDistanceToNow(new Date(search.createdAt), { addSuffix: true })}
+                      </Badge>
+                    </div>
                   </div>
-                  <div className="flex flex-col items-end gap-2 shrink-0">
+                  <div className="flex flex-col items-end shrink-0">
                     <Button 
                       variant="ghost" 
                       size="icon" 
@@ -164,10 +170,6 @@ export default function RecentSearches() {
                         <Trash2 className="w-4 h-4" />
                       )}
                     </Button>
-                    <Badge variant="outline" className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {formatDistanceToNow(new Date(search.createdAt), { addSuffix: true })}
-                    </Badge>
                   </div>
                 </div>
               </CardHeader>
@@ -186,9 +188,9 @@ export default function RecentSearches() {
                             {paper.authors && <span>👤 {paper.authors}</span>}
                             {paper.source && <span className="text-primary/70">{paper.source}</span>}
                           </div>
-                          <ScrollArea className="h-[200px] bg-muted/20 p-4 rounded-lg border mb-4">
+                          <div className="h-[200px] overflow-y-auto bg-muted/20 p-4 rounded-lg border mb-4">
                             <div className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: paper.abstract || "No abstract available" }} />
-                          </ScrollArea>
+                          </div>
                           <div className="flex justify-end">
                             <Button variant="outline" size="sm" asChild>
                               <a href={paper.url} target="_blank" rel="noopener noreferrer">
@@ -252,11 +254,11 @@ export default function RecentSearches() {
                         </div>
                       </div>
                     )}
-                    <ScrollArea className="flex-1 max-h-[400px] bg-muted/20 p-4 rounded-lg border">
+                    <div className="flex-1 overflow-y-auto max-h-[400px] bg-muted/20 p-4 rounded-lg border">
                       <div className="whitespace-pre-wrap text-sm leading-relaxed">
                         {search.result}
                       </div>
-                    </ScrollArea>
+                    </div>
                   </div>
                 )}
               </CardContent>

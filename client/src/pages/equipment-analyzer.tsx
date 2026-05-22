@@ -382,6 +382,7 @@ export default function EquipmentAnalyzer() {
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, ease: "easeOut" }}
                       className="pt-4"
                     >
                       <h3 className="text-sm text-muted-foreground mb-2">Safety Guidelines:</h3>
@@ -390,21 +391,12 @@ export default function EquipmentAnalyzer() {
                           .split('\n')
                           .filter(line => line.trim())
                           .map((line, index) => (
-                            <motion.p // Changed to motion.p for line-by-line animation
+                            <p
                               key={index}
-                              initial={{ opacity: 0, y: 15 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{
-                                type: "spring",
-                                stiffness: 120,
-                                damping: 14,
-                                mass: 0.8,
-                                delay: 0.2 + (index * 0.15)
-                              }}
                               className="mb-2"
                             >
                               {line.replace(/\*\*/g, '')}
-                            </motion.p>
+                            </p>
                           ))}
                       </div>
                     </motion.div>
@@ -418,11 +410,13 @@ export default function EquipmentAnalyzer() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="text-center text-muted-foreground w-full h-full min-h-[300px] flex flex-col items-center justify-center border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-lg p-6 bg-gray-50/30 dark:bg-gray-900/30"
+              className="w-full h-full"
             >
-              <img src="/placeholder.png" alt="Equipment Analysis Placeholder" className="w-40 h-40 mb-4 object-contain opacity-70" />
-              <h3 className="font-medium text-foreground/70 mb-2">Equipment Analysis</h3>
-              <p className="text-sm max-w-[250px] mx-auto">Upload or take a photo of lab equipment to see its details and safety guidelines here.</p>
+              <Card className="h-full border-2 border-dashed border-gray-200 dark:border-gray-800 bg-gray-50/30 dark:bg-gray-900/30 flex flex-col items-center justify-center p-6 text-center text-muted-foreground min-h-[300px]">
+                <img src="/placeholder.png" alt="Equipment Analysis Placeholder" className="w-40 h-40 mb-4 object-contain opacity-70 mx-auto" />
+                <h3 className="font-medium text-foreground/70 mb-2">Equipment Analysis</h3>
+                <p className="text-sm max-w-[250px] mx-auto">Upload or take a photo of lab equipment to see its details and safety guidelines here.</p>
+              </Card>
             </motion.div>
           )}
         </AnimatePresence>

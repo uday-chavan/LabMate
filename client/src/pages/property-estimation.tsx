@@ -258,35 +258,26 @@ SMILES: ${smiles}`;
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
             {properties.map((prop, index) => {
-              const randomRotation = Math.random() * 10 - 5;
-              const randomScale = 0.8 + Math.random() * 0.4;
-
               return (
                 <motion.div
                   key={prop.title}
                   initial={{
                     opacity: 0,
-                    scale: randomScale,
-                    rotate: randomRotation,
-                    y: 50
+                    y: 20
                   }}
                   animate={{
                     opacity: 1,
-                    scale: 1,
-                    rotate: 0,
                     y: 0,
                     transition: {
-                      type: "spring",
-                      stiffness: 100,
-                      damping: 15,
-                      delay: index * 0.1
+                      duration: 0.3,
+                      ease: "easeOut",
+                      delay: index * 0.04
                     }
                   }}
-                  exit={{ opacity: 0, scale: 0.8 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
                   whileHover={{
-                    scale: 1.05,
-                    rotate: randomRotation / 2,
-                    transition: { duration: 0.2 }
+                    scale: 1.02,
+                    transition: { duration: 0.15 }
                   }}
                 >
                   <Card className="overflow-hidden bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 hover:shadow-lg transition-all duration-300">
