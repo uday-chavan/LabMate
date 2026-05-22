@@ -92,16 +92,6 @@ Keep all text plain without any formatting or emphasis. Use natural, clear langu
 
     const analysis = parts.map((p: any) => p.text).join("");
 
-    if (req.user) {
-      await storage.createRecentSearch({
-        userId: req.user.id,
-        type: type, // 'chemical' or 'equipment'
-        query: mode === 'safety' ? 'Safety Analysis' : 'General Analysis',
-        image: base64Data, // This is now aggressively compressed by the frontend
-        result: analysis
-      });
-    }
-
     res.json({ analysis });
 
   } catch (error: any) {
@@ -357,16 +347,6 @@ Please provide your analysis in the following format:
 
     const analysis = parts.map((p: any) => p.text).join("");
     
-    if (req.user) {
-      await storage.createRecentSearch({
-        userId: req.user.id,
-        type: 'paper',
-        query: text.substring(0, 100) + '...', // Save first 100 chars as query preview
-        image: null,
-        result: analysis
-      });
-    }
-
     res.json({ analysis });
 
   } catch (error: any) {
@@ -405,7 +385,10 @@ router.post('/api/recent-searches', async (req, res) => {
 
     const data = schema.parse(req.body);
     const search = await storage.createRecentSearch({
-      ...data,
+      type: data.type,
+      query: data.query ?? null,
+      image: data.image ?? null,
+      result: data.result,
       userId: req.user.id
     });
     res.json(search);

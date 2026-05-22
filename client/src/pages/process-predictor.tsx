@@ -245,7 +245,7 @@ export default function ProcessPredictor() {
               </CardHeader>
               <CardContent>
                 <ScrollArea className="h-[500px] rounded-md border p-6" id="results-scroll-area">
-                  <div className="prose prose-lg max-w-none space-y-6">
+                  <div className="prose max-w-none space-y-6">
                     {prediction.split('\n\n').map((section, i) => {
                       // Special handling for the first section (direct answer)
                       if (i === 0) {
@@ -284,7 +284,7 @@ export default function ProcessPredictor() {
                           {lines.map((line, j) => (
                             <p
                               key={`${i}-${j}`}
-                              className="leading-relaxed text-foreground/80 font-normal mb-2"
+                              className="leading-relaxed text-foreground/80 font-normal mb-2 text-sm sm:text-base"
                             >
                               {line}
                             </p>
