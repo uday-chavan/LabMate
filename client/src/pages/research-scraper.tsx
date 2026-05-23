@@ -192,14 +192,11 @@ export default function ResearchScraper() {
   const isWorking = isLoading || isFetching;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="max-w-5xl mx-auto space-y-8 p-6"
-    >
-      <motion.header
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
+    <div className="max-w-5xl mx-auto space-y-8 p-6">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
         className="space-y-4"
       >
         <Card className="p-3 sm:p-4 border-2 shadow-sm bg-card/50 backdrop-blur-sm">
@@ -226,10 +223,15 @@ export default function ResearchScraper() {
         <p className="text-sm sm:text-base text-muted-foreground px-2 text-center sm:text-left">
           Search and analyze research papers related to chemistry and chemical procedures.
         </p>
-      </motion.header>
+      </motion.div>
 
       {/* ── Search Card ──────────────────────────────────────────────────────── */}
-      <Card className="overflow-hidden bg-gradient-to-br from-background to-background/80 border-2 hover:border-primary/50 transition-all duration-300">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3, ease: "easeOut", delay: 0.1 }}
+      >
+        <Card className="overflow-hidden bg-gradient-to-br from-background to-background/80 border-2 hover:border-primary/50 transition-all duration-300">
         <CardContent className="pt-6 space-y-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 w-full">
@@ -294,6 +296,7 @@ export default function ResearchScraper() {
           </div>
         </CardContent>
       </Card>
+      </motion.div>
 
       {/* ── Results Area ─────────────────────────────────────────────────────── */}
       <div className="flex flex-col md:flex-row gap-6 relative min-h-[600px]">
@@ -534,6 +537,6 @@ export default function ResearchScraper() {
           )}
         </AnimatePresence>
       </div>
-    </motion.div>
+    </div>
   );
 }

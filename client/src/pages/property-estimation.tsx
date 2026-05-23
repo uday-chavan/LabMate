@@ -154,8 +154,9 @@ SMILES: ${smiles}`;
   return (
     <div className="max-w-6xl mx-auto p-4 sm:p-6 space-y-8">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
         className="space-y-4"
       >
         <Card className="p-3 sm:p-4 border-2 shadow-sm bg-card/50 backdrop-blur-sm">
@@ -184,7 +185,12 @@ SMILES: ${smiles}`;
         </p>
       </motion.div>
 
-      <div className="flex flex-col gap-4">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3, ease: "easeOut", delay: 0.1 }}
+        className="flex flex-col gap-4"
+      >
         <div className="flex gap-4">
           <Input
             value={smiles}
@@ -235,7 +241,7 @@ SMILES: ${smiles}`;
             ))}
           </div>
         </div>
-      </div>
+      </motion.div>
 
       <AnimatePresence mode="wait">
         {mainTitle && (

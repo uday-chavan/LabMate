@@ -107,9 +107,10 @@ export default function ProcessPredictor() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 pt-4 sm:pt-6 pb-8 space-y-8">
-      <motion.header
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
         className="space-y-4"
       >
         <Card className="p-3 sm:p-4 border-2 shadow-sm bg-card/50 backdrop-blur-sm">
@@ -136,12 +137,12 @@ export default function ProcessPredictor() {
         <p className="text-muted-foreground px-2">
           Describe a chemical process or reaction and get AI-powered predictions and explanations.
         </p>
-      </motion.header>
+      </motion.div>
 
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3, ease: "easeOut", delay: 0.1 }}
       >
         <Card className="relative overflow-hidden">
           <CardContent className="pt-6 space-y-4">
@@ -154,7 +155,7 @@ export default function ProcessPredictor() {
                 placeholder="Enter your process or reaction details here..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="min-h-[120px] text-lg leading-relaxed focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all duration-300 relative bg-background"
+                className="min-h-[120px] text-base sm:text-lg leading-relaxed focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all duration-300 relative bg-background"
               />
             </motion.div>
 
@@ -248,8 +249,8 @@ export default function ProcessPredictor() {
                   Save
                 </Button>
               </CardHeader>
-              <CardContent>
-                <ScrollArea className="h-[500px] rounded-md border p-6" id="results-scroll-area">
+              <CardContent className="px-2 sm:px-6 pb-6">
+                <ScrollArea className="h-[500px] rounded-md border-2 border-black/20 dark:border-white/20 shadow-inner bg-card/50 p-3 sm:p-4" id="results-scroll-area">
                   <div className="prose max-w-none space-y-6">
                     {prediction.split('\n\n').map((section, i) => {
                       // Special handling for the first section (direct answer)

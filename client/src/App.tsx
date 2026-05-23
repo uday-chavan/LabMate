@@ -1,9 +1,9 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { WebSocketProvider } from "./lib/websocket.tsx";
-import { AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 import { AuthProvider } from "./hooks/use-auth";
 import Navbar from "@/components/layout/navbar";
@@ -20,6 +20,23 @@ import Credits from "@/pages/credits";
 import RecentSearches from "@/pages/recent-searches";
 import { ProtectedRoute } from "@/lib/protected-route";
 
+function AnimatedRoutes() {
+  return (
+    <Switch>
+      <ProtectedRoute path="/home" component={Home} />
+      <ProtectedRoute path="/predict" component={ProcessPredictor} />
+      <ProtectedRoute path="/research" component={ResearchScraper} />
+      <ProtectedRoute path="/equipment" component={EquipmentAnalyzer} />
+      <ProtectedRoute path="/chemical" component={ChemicalSafetyAnalyzer} />
+      <ProtectedRoute path="/block-diagram" component={BlockDiagram} />
+      <ProtectedRoute path="/property-estimation" component={PropertyEstimation} />
+      <ProtectedRoute path="/credits" component={Credits} />
+      <ProtectedRoute path="/recent" component={RecentSearches} />
+      <Route component={NotFound} />
+    </Switch>
+  );
+}
+
 function Router() {
   return (
     <AuthProvider>
@@ -30,20 +47,7 @@ function Router() {
             <>
               <Navbar />
               <main className="w-full">
-                <AnimatePresence mode="wait">
-                  <Switch>
-                    <ProtectedRoute path="/home" component={Home} />
-                    <ProtectedRoute path="/predict" component={ProcessPredictor} />
-                    <ProtectedRoute path="/research" component={ResearchScraper} />
-                    <ProtectedRoute path="/equipment" component={EquipmentAnalyzer} />
-                    <ProtectedRoute path="/chemical" component={ChemicalSafetyAnalyzer} />
-                    <ProtectedRoute path="/block-diagram" component={BlockDiagram} />
-                    <ProtectedRoute path="/property-estimation" component={PropertyEstimation} />
-                    <ProtectedRoute path="/credits" component={Credits} />
-                    <ProtectedRoute path="/recent" component={RecentSearches} />
-                    <Route component={NotFound} />
-                  </Switch>
-                </AnimatePresence>
+                <AnimatedRoutes />
               </main>
             </>
           </Route>

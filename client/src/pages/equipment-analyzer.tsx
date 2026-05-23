@@ -371,12 +371,13 @@ export default function EquipmentAnalyzer() {
 
   return (
     <div className="container px-4 py-6 sm:py-8 max-w-4xl mx-auto">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="space-y-6 sm:space-y-8"
-      >
-        <div className="space-y-4">
+      <div className="space-y-6 sm:space-y-8">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="space-y-4"
+        >
           <Card className="p-3 sm:p-4 border-2 shadow-sm bg-card/50 backdrop-blur-sm">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
               <div className="flex items-center gap-3 w-full sm:w-auto justify-start">
@@ -401,9 +402,14 @@ export default function EquipmentAnalyzer() {
           <p className="text-sm sm:text-base text-muted-foreground px-2 text-center sm:text-left">
             Take a photo or upload an image of lab equipment to analyze it.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="grid md:grid-cols-5 gap-6">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3, ease: "easeOut", delay: 0.1 }}
+          className="grid md:grid-cols-5 gap-6"
+        >
           <Card className="md:col-span-3 p-4 sm:p-6 border-2 border-primary/20">
             <div
               className={`border-2 border-dashed rounded-lg p-4 sm:p-8 text-center space-y-4 transition-colors duration-200 ${
@@ -553,7 +559,7 @@ export default function EquipmentAnalyzer() {
               )}
             </AnimatePresence>
           </div>
-        </div>
+        </motion.div>
 
         <AnimatePresence>
           {showAnalysis && !analyzing && (
@@ -569,7 +575,7 @@ export default function EquipmentAnalyzer() {
             </motion.div>
           )}
         </AnimatePresence>
-      </motion.div>
+      </div>
     </div>
   );
 }

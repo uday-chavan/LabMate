@@ -238,29 +238,29 @@ export default function Navbar() {
       </div>
 
       {/* Mobile Menu */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden border-t bg-background"
-          >
-            <nav className="container py-4 space-y-2">
-              {menuItems.map(({ href, icon: Icon, label }) => {
-                const isActive = location === href;
-                return (
+      <div 
+        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${mobileMenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
+        style={{ willChange: "max-height, opacity" }}
+      >
+        <div className="border-t bg-background">
+          <nav className="container py-4 space-y-2">
+            {menuItems.map(({ href, icon: Icon, label }) => {
+              const isActive = location === href;
+              return (
                 <Link key={href} href={href}>
-                  <a className={`flex items-center gap-3 px-4 py-3 text-sm rounded-md transition-all ${isActive ? 'bg-primary/10 border-2 border-primary text-primary font-bold shadow-sm' : 'hover:bg-accent hover:text-accent-foreground border-2 border-transparent'}`}>
+                  <a 
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-3 text-sm rounded-md transition-all ${isActive ? 'bg-primary/10 border-2 border-primary text-primary font-bold shadow-sm' : 'hover:bg-accent hover:text-accent-foreground border-2 border-transparent'}`}
+                  >
                     <Icon className={`w-4 h-4 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
                     {label}
                   </a>
                 </Link>
-              )})}
-            </nav>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              );
+            })}
+          </nav>
+        </div>
+      </div>
       <Dialog open={profileOpen} onOpenChange={setProfileOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>

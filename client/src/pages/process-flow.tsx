@@ -118,8 +118,9 @@ export default function BlockDiagram() {
   return (
     <div className="container px-4 py-4 max-w-7xl mx-auto">
       <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
         className="space-y-4 sm:space-y-6"
       >
         <motion.div
