@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -112,6 +112,7 @@ export default function ResearchScraper() {
   const [selectedPaper, setSelectedPaper] = useState<string | null>(null);
   const [forceAIPaper, setForceAIPaper] = useState<string | null>(null);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     sessionStorage.setItem('rs-searchQuery', searchQuery);
@@ -160,6 +161,10 @@ export default function ResearchScraper() {
     retry: 2,
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 8000),
     staleTime: 10 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 
   const handleSearch = () => {
@@ -254,19 +259,23 @@ export default function ResearchScraper() {
                   <SelectItem value="recent">Last Year</SelectItem>
                 </SelectContent>
               </Select>
-              <Button onClick={handleSearch} disabled={isWorking} className="flex-1 md:min-w-[120px]">
-                {isWorking ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Searching...
-                  </>
-                ) : (
-                  <>
-                    <Search className="mr-2 h-4 w-4" />
-                    Search
-                  </>
-                )}
-              </Button>
+              {isWorking ? (
+                <Button 
+                  onClick={() => {
+                    queryClient.cancelQueries({ queryKey: ["papers", submittedQuery] });
+                    setSubmittedQuery("");
+                  }} 
+                  variant="destructive" 
+                  className="flex-1 md:min-w-[120px]"
+                >
+                  Cancel Search
+                </Button>
+              ) : (
+                <Button onClick={handleSearch} className="flex-1 md:min-w-[120px]">
+                  <Search className="mr-2 h-4 w-4" />
+                  Search
+                </Button>
+              )}
             </div>
           </div>
 

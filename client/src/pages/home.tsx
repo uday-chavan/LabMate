@@ -22,10 +22,6 @@ export default function Home() {
   const [, setLocation] = useLocation();
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
-  const handleNavigation = (path: string) => {
-    setTimeout(() => setLocation(path), 800);
-  };
-
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -166,7 +162,7 @@ export default function Home() {
               onHoverEnd={() => setHoveredCard(null)}
             >
               <Link href={card.href}>
-                <Card className="group cursor-pointer h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                <Card className="group cursor-pointer h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-black/20 dark:border-white/20 border-2">
                   <CardHeader className={`relative overflow-hidden rounded-t-lg bg-gradient-to-r ${card.color}`}>
                     <motion.div
                       animate={{
@@ -189,16 +185,20 @@ export default function Home() {
                     <p className="text-muted-foreground text-sm md:text-base">
                       {card.description}
                     </p>
-                    <motion.div
-                      animate={{
-                        x: hoveredCard === card.href ? 5 : 0,
-                        opacity: hoveredCard === card.href ? 1 : 0.7
-                      }}
-                      className="flex items-center gap-2 mt-4 text-primary font-medium"
-                    >
-                      <span>{card.actionText || "Get Started"}</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </motion.div>
+                    <div className="mt-4 flex">
+                      <Button 
+                        variant="secondary" 
+                        className="w-full sm:w-auto h-12 px-6 rounded-xl bg-primary/10 text-black dark:text-white font-bold text-lg tracking-wide hover:bg-primary/20 border-black/50 dark:border-white/50 border-2 transition-all duration-300"
+                      >
+                        {card.actionText || "Use"}
+                        <motion.div
+                          animate={{ x: hoveredCard === card.href ? 4 : 0 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </motion.div>
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               </Link>

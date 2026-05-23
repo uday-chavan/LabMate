@@ -62,6 +62,7 @@ export default function PropertyEstimation() {
   const [properties, setProperties] = useState<PropertyData[]>(cachedProperties);
   const [mainTitle, setMainTitle] = useState<string>(cachedMainTitle);
   const [loading, setLoading] = useState(false);
+  const [abortController, setAbortController] = useState<AbortController | null>(null);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -94,6 +95,9 @@ export default function PropertyEstimation() {
     setProperties([]);
     setMainTitle("");
 
+    const controller = new AbortController();
+    setAbortController(controller);
+
     try {
       const query = `Analyze this SMILES structure and provide ONLY these properties in this EXACT format. Include numerical values where applicable and keep descriptions very short (1-3 words):
 
@@ -116,7 +120,7 @@ Ionization: [X.XX eV]
 
 SMILES: ${smiles}`;
 
-      const result = await predictProcess(query);
+      const result = await predictProcess(query, controller.signal);
       const lines = result.split('\n').filter(line => line.trim());
 
       if (lines.length > 0) {
@@ -144,11 +148,17 @@ SMILES: ${smiles}`;
 
         setProperties(shuffledProperties);
       }
-    } catch (error) {
-      console.error('Error:', error);
-      setError("Failed to estimate properties");
+    } catch (error: any) {
+      if (error.name === 'AbortError' || error.message?.includes('abort')) {
+        console.log('Estimation cancelled');
+      } else {
+        console.error('Error:', error);
+        setError("Failed to estimate properties");
+      }
+    } finally {
+      setLoading(false);
+      setAbortController(null);
     }
-    setLoading(false);
   };
 
   return (
@@ -210,6 +220,15 @@ SMILES: ${smiles}`;
               </>
             ) : "Estimate"}
           </Button>
+          {loading && (
+            <Button
+              onClick={() => abortController?.abort()}
+              variant="destructive"
+              className="min-w-[120px]"
+            >
+              Cancel
+            </Button>
+          )}
         </div>
 
         <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">

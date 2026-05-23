@@ -33,6 +33,7 @@ export default function EquipmentAnalyzer() {
   const [analyzing, setAnalyzing] = useState(false);
   const [showSafety, setShowSafety] = useState(cachedShowSafety);
   const [showAnalysis, setShowAnalysis] = useState(cachedShowAnalysis);
+  const [abortController, setAbortController] = useState<AbortController | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -74,8 +75,10 @@ export default function EquipmentAnalyzer() {
     }
 
     setAnalyzing(true);
+    const controller = new AbortController();
+    setAbortController(controller);
     try {
-      const safetyAnalysis = await analyzeImage(previewUrl, 'equipment', 'safety');
+      const safetyAnalysis = await analyzeImage(previewUrl, 'equipment', 'safety', controller.signal);
 
       // Extract only the general safety points
       const points = safetyAnalysis
@@ -123,14 +126,19 @@ export default function EquipmentAnalyzer() {
         updatedEquipment,
       );
       setShowSafety(true);
-    } catch (error) {
-      toast({
-        title: "Safety Analysis Failed",
-        description: "Failed to analyze safety guidelines. Please try again.",
-        variant: "destructive",
-      });
+    } catch (error: any) {
+      if (error.name === 'AbortError' || error.message?.includes('abort')) {
+        console.log('Safety analysis cancelled');
+      } else {
+        toast({
+          title: "Safety Analysis Failed",
+          description: "Failed to analyze safety guidelines. Please try again.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setAnalyzing(false);
+      setAbortController(null);
     }
   };
 
@@ -180,8 +188,10 @@ export default function EquipmentAnalyzer() {
     }
 
     setAnalyzing(true);
+    const controller = new AbortController();
+    setAbortController(controller);
     try {
-      const analysis = await analyzeImage(previewUrl, 'equipment');
+      const analysis = await analyzeImage(previewUrl, 'equipment', undefined, controller.signal);
       const equipmentDetails: EquipmentDetails = {
         name: analysis.split("\n")[0],
         description: analysis.split("\n").slice(1).join("\n"),
@@ -199,14 +209,19 @@ export default function EquipmentAnalyzer() {
         detectedEquipment,
       );
       setShowAnalysis(true);
-    } catch (error) {
-      toast({
-        title: "Analysis Failed",
-        description: "Failed to analyze the image. Please try again.",
-        variant: "destructive",
-      });
+    } catch (error: any) {
+      if (error.name === 'AbortError' || error.message?.includes('abort')) {
+        console.log('Analysis cancelled');
+      } else {
+        toast({
+          title: "Analysis Failed",
+          description: "Failed to analyze the image. Please try again.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setAnalyzing(false);
+      setAbortController(null);
     }
   };
 
@@ -230,6 +245,10 @@ export default function EquipmentAnalyzer() {
     },
     enabled: false,
     staleTime: 10 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 
   const renderAnalysis = () => {
@@ -361,6 +380,15 @@ export default function EquipmentAnalyzer() {
                     </>
                   )}
                 </Button>
+                {analyzing && (
+                  <Button
+                    onClick={() => abortController?.abort()}
+                    variant="destructive"
+                    className="w-full mt-2"
+                  >
+                    Cancel
+                  </Button>
+                )}
               </div>
             )}
           </motion.div>
@@ -457,6 +485,15 @@ export default function EquipmentAnalyzer() {
                         </>
                       )}
                     </Button>
+                    {analyzing && (
+                      <Button
+                        onClick={() => abortController?.abort()}
+                        variant="destructive"
+                        className="w-full sm:w-auto"
+                      >
+                        Cancel
+                      </Button>
+                    )}
                   </div>
                 </div>
               ) : (

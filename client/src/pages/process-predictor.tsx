@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -41,6 +41,7 @@ export default function ProcessPredictor() {
   const [query, setQuery] = useState(() => sessionStorage.getItem('process-query') || "");
   const [activeQuery, setActiveQuery] = useState(() => sessionStorage.getItem('process-activeQuery') || "");
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const resultsRef = useRef(null);
 
   useEffect(() => {
@@ -71,9 +72,13 @@ export default function ProcessPredictor() {
 
   const { data: prediction, isLoading, error, refetch } = useQuery({
     queryKey: ['prediction', activeQuery],
-    queryFn: () => predictProcess(activeQuery),
+    queryFn: ({ signal }) => predictProcess(activeQuery, signal),
     enabled: !!activeQuery,
     staleTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 60 * 60 * 1000, // 1 hour
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 
   const handlePredict = async () => {
@@ -90,6 +95,11 @@ export default function ProcessPredictor() {
     } else {
       setActiveQuery(query.trim());
     }
+  };
+
+  const handleCancel = () => {
+    queryClient.cancelQueries({ queryKey: ['prediction', activeQuery] });
+    setActiveQuery("");
   };
 
   // Scroll to results when they appear
@@ -189,23 +199,24 @@ export default function ProcessPredictor() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <Button
-                onClick={handlePredict}
-                disabled={isLoading}
-                className="w-full"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Analyzing Process...
-                  </>
-                ) : (
-                  <>
-                    <Beaker className="mr-2 h-4 w-4" />
-                    Predict Process
-                  </>
-                )}
-              </Button>
+              {isLoading ? (
+                <Button
+                  onClick={handleCancel}
+                  variant="destructive"
+                  className="w-full"
+                >
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Cancel Prediction
+                </Button>
+              ) : (
+                <Button
+                  onClick={handlePredict}
+                  className="w-full"
+                >
+                  <Beaker className="mr-2 h-4 w-4" />
+                  Predict Process
+                </Button>
+              )}
             </motion.div>
           </CardContent>
         </Card>

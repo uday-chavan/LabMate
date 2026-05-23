@@ -239,8 +239,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       <div 
-        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${mobileMenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
-        style={{ willChange: "max-height, opacity" }}
+        className={`md:hidden ${mobileMenuOpen ? 'block' : 'hidden'}`}
       >
         <div className="border-t bg-background">
           <nav className="container py-4 space-y-2">

@@ -2,7 +2,7 @@
 import { motion } from "framer-motion";
 import { Beaker, Camera, TestTube, GitBranch, Calculator, Search } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Code2, Bell } from "lucide-react";
+import { Code2, Bell, ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 
@@ -15,10 +15,19 @@ export default function Credits() {
         transition={{ duration: 0.5 }}
         className="flex flex-col items-center"
       >
-        <div className="mb-8 flex items-center justify-center">
-          <Code2 className="mr-2 h-8 w-8 text-primary" />
-          <h1 className="text-3xl font-bold">Credits</h1>
-        </div>
+        <Card className="mb-8 w-full max-w-3xl p-3 sm:p-4 border-2 shadow-sm bg-card/50 backdrop-blur-sm">
+          <div className="flex items-center gap-3">
+            <Button variant="outline" size="icon" asChild className="h-9 w-9 shrink-0 rounded-full border-2 hover:bg-primary/10 hover:text-primary transition-colors">
+              <Link href="/home">
+                <ArrowLeft className="w-4 h-4" />
+              </Link>
+            </Button>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">
+              <Code2 className="w-6 h-6 text-primary shrink-0" />
+              Credits
+            </h1>
+          </div>
+        </Card>
 
         <div className="max-w-3xl w-full bg-card rounded-lg shadow-md p-6 mb-8">
           <h2 className="text-2xl font-semibold mb-4 text-center">Software Name: LabMate</h2>

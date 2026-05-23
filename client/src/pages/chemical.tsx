@@ -81,13 +81,13 @@ export default function Chemical() {
     if (file) handleFileSelect(file);
   };
 
-  const { data: analysis, isLoading, refetch } = useQuery({
+  const { data: analysis, isLoading, refetch, isFetching } = useQuery({
     queryKey: ['chemical-analysis', previewUrl],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       if (!previewUrl) return null;
       setAnalyzing(true);
       try {
-        const result = await analyzeImage(previewUrl, 'chemical');
+        const result = await analyzeImage(previewUrl, 'chemical', undefined, signal);
         setShowAnalysis(true);
 
         // Extract hazards from analysis
@@ -119,6 +119,10 @@ export default function Chemical() {
     },
     enabled: false,
     staleTime: 10 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 
   const startAnalysis = () => {
@@ -335,7 +339,7 @@ export default function Chemical() {
                       className="bg-primary hover:bg-primary/90 w-full sm:w-auto"
                       disabled={analyzing}
                     >
-                      {analyzing ? (
+                      {analyzing || isFetching ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           Analyzing...
@@ -347,6 +351,15 @@ export default function Chemical() {
                         </>
                       )}
                     </Button>
+                    {(analyzing || isFetching) && (
+                      <Button
+                        onClick={() => queryClient.cancelQueries({ queryKey: ['chemical-analysis', previewUrl] })}
+                        variant="destructive"
+                        className="w-full sm:w-auto"
+                      >
+                        Cancel
+                      </Button>
+                    )}
                   </div>
                 </div>
               ) : (

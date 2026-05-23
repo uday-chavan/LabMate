@@ -8,15 +8,13 @@ import { useAuth } from "@/hooks/use-auth";
 
 export default function IntroPage() {
   const [, setLocation] = useLocation();
-  const [isExiting, setIsExiting] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { user, loginMutation, registerMutation } = useAuth();
 
   const handleGetStarted = () => {
-    setIsExiting(true);
-    setTimeout(() => setLocation("/home"), 800);
+    setLocation("/home");
   };
 
   const handleLogin = (e: React.FormEvent) => {
@@ -165,18 +163,6 @@ export default function IntroPage() {
           <div className="text-xs opacity-80">Guided by - Dr. P. S. Bhandari</div>
         </motion.div>
       </div>
-
-      <AnimatePresence>
-        {isExiting && (
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -20, opacity: 0 }}
-            className="fixed inset-0 bg-background"
-            transition={{ type: "spring", stiffness: 260, damping: 20, duration: 0.3 }}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 }

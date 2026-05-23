@@ -6,11 +6,12 @@
 
 import { compressImage } from "./image-compressor";
 
-export async function predictProcess(query: string): Promise<string> {
+export async function predictProcess(query: string, signal?: AbortSignal): Promise<string> {
   const response = await fetch('/api/predict-process', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query }),
+    signal,
   });
 
   if (!response.ok) {
@@ -22,12 +23,13 @@ export async function predictProcess(query: string): Promise<string> {
   return data.prediction;
 }
 
-export async function analyzeImage(imageBase64: string, type: 'equipment' | 'chemical', mode?: 'safety'): Promise<string> {
+export async function analyzeImage(imageBase64: string, type: 'equipment' | 'chemical', mode?: 'safety', signal?: AbortSignal): Promise<string> {
   const compressedImage = await compressImage(imageBase64);
   const response = await fetch('/api/analyze-image', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ imageData: compressedImage, type, mode }),
+    signal,
   });
 
   if (!response.ok) {
@@ -39,11 +41,12 @@ export async function analyzeImage(imageBase64: string, type: 'equipment' | 'che
   return data.analysis;
 }
 
-export async function analyzePaper(text: string): Promise<string> {
+export async function analyzePaper(text: string, signal?: AbortSignal): Promise<string> {
   const response = await fetch('/api/analyze-paper', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ text }),
+    signal,
   });
 
   if (!response.ok) {
@@ -55,11 +58,12 @@ export async function analyzePaper(text: string): Promise<string> {
   return data.analysis;
 }
 
-export async function generateMermaidDiagram(description: string): Promise<string> {
+export async function generateMermaidDiagram(description: string, signal?: AbortSignal): Promise<string> {
   const response = await fetch('/api/generate-diagram', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ description }),
+    signal,
   });
 
   if (!response.ok) {
