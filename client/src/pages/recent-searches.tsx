@@ -154,15 +154,19 @@ export default function RecentSearches() {
   const backInfo = getBackLinkInfo(typeFilter);
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-4xl mx-auto">
-      <div className="flex items-center gap-3">
-        <Button variant="outline" size="icon" asChild className="h-9 w-9 shrink-0">
-          <Link href={backInfo.link}>
-            <ArrowLeft className="w-5 h-5" />
-          </Link>
-        </Button>
-        <h1 className="text-2xl sm:text-4xl font-bold tracking-tight">{getPageTitle(typeFilter)}</h1>
-      </div>
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-4xl mx-auto px-4 pt-4 sm:pt-6 pb-8">
+      <Card className="p-3 sm:p-4 border-2 shadow-sm bg-card/50 backdrop-blur-sm">
+        <div className="flex items-center gap-3">
+          <Button variant="outline" size="icon" asChild className="h-9 w-9 shrink-0 rounded-full border-2 hover:bg-primary/10 hover:text-primary transition-colors">
+            <Link href={backInfo.link}>
+              <ArrowLeft className="w-4 h-4" />
+            </Link>
+          </Button>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">
+            {getPageTitle(typeFilter)}
+          </h1>
+        </div>
+      </Card>
 
       {!searches || searches.length === 0 ? (
         <Card className="p-12 text-center border-dashed">
@@ -175,8 +179,8 @@ export default function RecentSearches() {
       ) : (
         <div className="space-y-6">
           {searches.map((search) => (
-            <Card key={search.id} className="overflow-hidden transition-all hover:shadow-lg border-primary/10">
-              <CardHeader className="bg-muted/30 pb-4">
+            <Card key={search.id} className="overflow-hidden transition-all hover:shadow-md border-2 border-primary/10">
+              <CardHeader className="bg-muted/30 pb-4 border-b">
                 <div className="flex justify-between items-start gap-4">
                   <div className="min-w-0 flex-1">
                     <CardTitle className="flex items-center gap-2 text-xl">
@@ -187,7 +191,7 @@ export default function RecentSearches() {
                       {search.type.charAt(0).toUpperCase() + search.type.slice(1)} Analysis
                     </CardTitle>
                     {search.query && (
-                      <CardDescription className="mt-2 text-base font-medium break-all line-clamp-3">
+                      <CardDescription className="mt-3 text-sm sm:text-base font-medium break-words text-foreground/90 leading-relaxed">
                         {search.query}
                       </CardDescription>
                     )}
@@ -284,9 +288,9 @@ export default function RecentSearches() {
                     }
                   })()
                 ) : (
-                  <div className="flex flex-col md:flex-row gap-6">
+                  <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                     {search.image && (
-                      <div className="w-full md:w-1/3 shrink-0">
+                      <div className="w-40 h-40 sm:w-1/3 sm:h-auto shrink-0 mx-auto sm:mx-0">
                         <div className="aspect-square relative rounded-lg overflow-hidden border shadow-sm">
                           <img
                             src={search.image}

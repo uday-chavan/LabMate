@@ -202,27 +202,28 @@ export default function ResearchScraper() {
         animate={{ opacity: 1, y: 0 }}
         className="space-y-4"
       >
-        <div className="flex flex-col sm:flex-row items-center sm:justify-between w-full gap-4 text-center sm:text-left">
-          <div className="flex items-center gap-3">
-            <Button variant="outline" size="icon" asChild className="h-9 w-9 shrink-0">
-              <Link href="/home">
-                <ArrowLeft className="w-5 h-5" />
+        <Card className="p-3 sm:p-4 border-2 shadow-sm bg-card/50 backdrop-blur-sm">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
+            <div className="flex items-center gap-3 w-full sm:w-auto justify-start">
+              <Button variant="outline" size="icon" asChild className="h-9 w-9 shrink-0 rounded-full border-2 hover:bg-primary/10 hover:text-primary transition-colors">
+                <Link href="/home">
+                  <ArrowLeft className="w-4 h-4" />
+                </Link>
+              </Button>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">
+                <BookOpen className="w-6 h-6 text-primary shrink-0" />
+                Research Papers
+              </h1>
+            </div>
+            <Button variant="outline" size="sm" asChild className="w-full sm:w-auto border-2 hover:bg-primary/5 transition-colors">
+              <Link href="/recent?type=paper">
+                <Bookmark className="w-4 h-4 mr-2" />
+                <span>Saved Papers</span>
               </Link>
             </Button>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight flex items-center gap-2">
-              <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-primary shrink-0" />
-              Research Papers
-            </h1>
           </div>
-          <Button variant="outline" size="sm" asChild className="w-full sm:w-auto">
-            <Link href="/recent?type=paper">
-              <Bookmark className="w-4 h-4 mr-2" />
-              <span className="sm:hidden">Saved</span>
-              <span className="hidden sm:inline">Saved Papers</span>
-            </Link>
-          </Button>
-        </div>
-        <p className="text-muted-foreground">
+        </Card>
+        <p className="text-sm sm:text-base text-muted-foreground px-2 text-center sm:text-left">
           Search and analyze research papers related to chemistry and chemical procedures.
         </p>
       </motion.header>

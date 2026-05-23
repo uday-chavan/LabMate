@@ -123,33 +123,33 @@ export default function BlockDiagram() {
         className="space-y-4 sm:space-y-6"
       >
         <motion.div
-          className="text-center space-y-3"
+          className="space-y-4"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, type: "spring" }}
         >
-          <div className="relative inline-flex flex-col items-center">
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <div className="flex items-center justify-center sm:justify-start gap-3 w-full sm:w-auto">
-                <Button variant="outline" size="icon" asChild className="h-9 w-9 shrink-0">
+          <Card className="p-3 sm:p-4 border-2 shadow-sm bg-card/50 backdrop-blur-sm">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
+              <div className="flex items-center gap-3 w-full sm:w-auto justify-start">
+                <Button variant="outline" size="icon" asChild className="h-9 w-9 shrink-0 rounded-full border-2 hover:bg-primary/10 hover:text-primary transition-colors">
                   <Link href="/home">
-                    <ArrowLeft className="w-5 h-5" />
+                    <ArrowLeft className="w-4 h-4" />
                   </Link>
                 </Button>
-                <h1 className="text-xl sm:text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent text-center sm:text-left py-1">
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">
+                  <GitBranch className="w-6 h-6 text-primary shrink-0" />
                   Block Diagram Generator
                 </h1>
               </div>
-              <Button variant="outline" size="sm" asChild className="w-full sm:w-auto">
+              <Button variant="outline" size="sm" asChild className="w-full sm:w-auto border-2 hover:bg-primary/5 transition-colors">
                 <Link href="/recent?type=diagram">
                   <Bookmark className="w-4 h-4 mr-2" />
-                  <span className="sm:hidden">Saved</span>
-                  <span className="hidden sm:inline">Saved Diagrams</span>
+                  <span>Saved Diagrams</span>
                 </Link>
               </Button>
             </div>
-          </div>
-          <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
+          </Card>
+          <p className="text-sm sm:text-base text-muted-foreground px-2 text-center sm:text-left">
             Describe your process in natural language and let AI create a block diagram
           </p>
           <motion.div 
@@ -200,7 +200,7 @@ Step 13: Final Compounding & Processing with additives.`);
                 </CardTitle>
               </CardHeader>
               <CardContent className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 animate-gradient-x pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 pointer-events-none" />
                 <Textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -218,7 +218,7 @@ Step 13: Final Compounding & Processing with additives.`);
                     className="flex-1 relative overflow-hidden group"
                     disabled={isGenerating}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/30 to-primary/0 group-hover:animate-gradient-x pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/30 to-primary/0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity" />
                     {isGenerating ? (
                       <>
                         <RotateCw className="w-4 h-4 mr-2 animate-spin" />

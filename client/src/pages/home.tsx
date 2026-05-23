@@ -89,7 +89,8 @@ export default function Home() {
       icon: Code2,
       title: "Credits",
       description: "View acknowledgments and contributors to the project",
-      color: "from-indigo-500/20 to-blue-500/20"
+      color: "from-indigo-500/20 to-blue-500/20",
+      actionText: "Show Credits"
     }
   ];
 
@@ -104,29 +105,44 @@ export default function Home() {
         damping: 20,
         duration: 0.3
       }}
-      className="relative space-y-8 md:space-y-12 px-4 py-8 md:py-12 overflow-hidden"
+      className="relative space-y-8 md:space-y-12 px-4 pb-8 md:pb-12 pt-0 w-full overflow-hidden"
     >
       {/* Left side ambient blob */}
-      <div className="hidden md:block absolute left-0 top-0 h-[600px] w-[600px] bg-blue-500/10 blur-[100px] rounded-full pointer-events-none -translate-x-1/2 -translate-y-1/4"></div>
+      <div className="absolute left-0 top-0 h-[600px] w-[600px] rounded-full pointer-events-none -translate-x-1/2 -translate-y-1/4" style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%)' }}></div>
 
       {/* Right side ambient blob */}
-      <div className="hidden md:block absolute right-0 top-0 h-[600px] w-[600px] bg-orange-500/10 blur-[100px] rounded-full pointer-events-none translate-x-1/2 -translate-y-1/4"></div>
+      <div className="absolute right-0 top-0 h-[600px] w-[600px] rounded-full pointer-events-none translate-x-1/2 -translate-y-1/4" style={{ background: 'radial-gradient(circle, rgba(249,115,22,0.15) 0%, transparent 70%)' }}></div>
 
       <motion.header
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="text-center space-y-4 md:space-y-6"
+        className="relative z-10 w-full max-w-5xl mx-auto mb-8 px-2 sm:px-0 text-center space-y-4 md:space-y-6"
       >
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground px-4">
-          Your AI-Powered Lab Assistant
-        </h1>
-        <p className="text-base md:text-lg text-muted-foreground max-w-3xl mx-auto px-4">
+        <div className="relative inline-block mx-auto">
+          <Card className="inline-block bg-card/40 backdrop-blur-md border-2 border-primary/40 shadow-sm relative overflow-hidden rounded-xl sm:rounded-2xl">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 pointer-events-none" />
+            <CardContent className="py-5 sm:py-8 px-6 sm:px-12 relative z-10 flex flex-col items-center justify-center">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-center leading-tight sm:leading-tight md:leading-tight">
+                <span className="text-primary">
+                  Your AI-Powered
+                </span>
+                <br className="md:hidden" />
+                <span className="text-foreground mt-1 sm:mt-2 md:mt-0 md:ml-3 inline-block">
+                  Lab Assistant
+                </span>
+              </h1>
+            </CardContent>
+          </Card>
+        </div>
+
+        <p className="text-base md:text-lg text-muted-foreground max-w-3xl mx-auto mt-6">
           Your comprehensive lab safety and research companion with intelligent features and
           emergency notification system.
         </p>
+
         {/* Animation positioned below the heading */}
-        <div className="flex justify-center items-center gap-1 sm:gap-2 text-xs min-[375px]:text-sm sm:text-xl md:text-2xl font-medium mt-6 mb-8 whitespace-nowrap">
+        <div className="flex justify-center items-center gap-1 sm:gap-2 text-xs min-[375px]:text-sm sm:text-xl md:text-2xl font-medium mt-6 whitespace-nowrap bg-background/50 rounded-full py-2 px-4 sm:px-6 border shadow-sm w-fit mx-auto">
           <span>LabMate can</span>
           <TypeAnimation
             phrases={[
@@ -191,7 +207,7 @@ export default function Home() {
                       }}
                       className="flex items-center gap-2 mt-4 text-primary font-medium"
                     >
-                      <span>Get Started</span>
+                      <span>{card.actionText || "Get Started"}</span>
                       <ArrowRight className="w-4 h-4" />
                     </motion.div>
                   </CardContent>

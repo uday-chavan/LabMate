@@ -1,4 +1,4 @@
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import ReactCrop, { type Crop, centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
@@ -52,6 +52,7 @@ import AlertButton from "@/components/alert-button";
 import { useAuth } from "@/hooks/use-auth";
 
 export default function Navbar() {
+  const [location] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [editName, setEditName] = useState("");
@@ -172,16 +173,18 @@ export default function Navbar() {
         {/* Desktop Navigation */}
         <NavigationMenu className="hidden md:flex">
           <NavigationMenuList className="flex-wrap justify-center">
-            {menuItems.map(({ href, icon: Icon, label }) => (
+            {menuItems.map(({ href, icon: Icon, label }) => {
+              const isActive = location === href;
+              return (
               <NavigationMenuItem key={href}>
                 <Link href={href}>
-                  <NavigationMenuLink className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground rounded-md">
+                  <NavigationMenuLink className={`flex items-center gap-2 px-3 py-2 text-sm transition-all rounded-md ${isActive ? 'bg-primary/10 border-2 border-primary text-primary font-bold shadow-sm' : 'hover:bg-accent hover:text-accent-foreground border-2 border-transparent'}`}>
                     <Icon className="h-4 w-4" />
                     <span className="whitespace-nowrap">{label}</span>
                   </NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
-            ))}
+            )})}
           </NavigationMenuList>
         </NavigationMenu>
 
@@ -244,14 +247,16 @@ export default function Navbar() {
             className="md:hidden border-t bg-background"
           >
             <nav className="container py-4 space-y-2">
-              {menuItems.map(({ href, icon: Icon, label }) => (
+              {menuItems.map(({ href, icon: Icon, label }) => {
+                const isActive = location === href;
+                return (
                 <Link key={href} href={href}>
-                  <a className="flex items-center gap-3 px-4 py-2 text-sm rounded-md hover:bg-accent hover:text-accent-foreground transition-colors">
-                    <Icon className="w-4 h-4 text-primary" />
+                  <a className={`flex items-center gap-3 px-4 py-3 text-sm rounded-md transition-all ${isActive ? 'bg-primary/10 border-2 border-primary text-primary font-bold shadow-sm' : 'hover:bg-accent hover:text-accent-foreground border-2 border-transparent'}`}>
+                    <Icon className={`w-4 h-4 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
                     {label}
                   </a>
                 </Link>
-              ))}
+              )})}
             </nav>
           </motion.div>
         )}

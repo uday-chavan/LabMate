@@ -72,7 +72,7 @@ export default function PanicButton() {
               className="flex justify-center"
             >
               <div className="relative">
-                <div className="absolute inset-0 bg-destructive/30 rounded-full blur-xl animate-pulse" />
+                <div className="absolute inset-0 bg-destructive/10 rounded-full scale-110" />
                 <Button
                   variant="destructive"
                   size="lg"
