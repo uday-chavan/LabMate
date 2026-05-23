@@ -4,6 +4,7 @@ import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { WebSocketProvider } from "./lib/websocket.tsx";
 import { motion, AnimatePresence } from "framer-motion";
+import { useEffect } from "react";
 
 import { AuthProvider } from "./hooks/use-auth";
 import Navbar from "@/components/layout/navbar";
@@ -19,6 +20,16 @@ import PropertyEstimation from "@/pages/property-estimation";
 import Credits from "@/pages/credits"; 
 import RecentSearches from "@/pages/recent-searches";
 import { ProtectedRoute } from "@/lib/protected-route";
+
+function ScrollToTop() {
+  const [pathname] = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
 
 function AnimatedRoutes() {
   return (
@@ -62,6 +73,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <WebSocketProvider>
+        <ScrollToTop />
         <Router />
         <Toaster />
       </WebSocketProvider>
