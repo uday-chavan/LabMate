@@ -16,16 +16,18 @@ export default function Credits() {
         className="flex flex-col items-center"
       >
         <Card className="mb-8 w-full max-w-3xl p-3 sm:p-4 border-2 shadow-sm bg-card/50 backdrop-blur-sm">
-          <div className="flex items-center gap-3">
-            <Button variant="outline" size="icon" asChild className="h-9 w-9 shrink-0 rounded-full border-2 hover:bg-primary/10 hover:text-primary transition-colors">
+          <div className="flex items-center relative min-h-[36px]">
+            <Button variant="outline" size="icon" asChild className="absolute left-0 h-9 w-9 shrink-0 rounded-full border-2 hover:bg-primary/10 hover:text-primary transition-colors z-10">
               <Link href="/home">
                 <ArrowLeft className="w-4 h-4" />
               </Link>
             </Button>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">
-              <Code2 className="w-6 h-6 text-primary shrink-0" />
-              Credits
-            </h1>
+            <div className="w-full flex justify-center">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">
+                <Code2 className="w-6 h-6 text-primary shrink-0" />
+                Credits
+              </h1>
+            </div>
           </div>
         </Card>
 
