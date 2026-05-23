@@ -107,10 +107,10 @@ export default function Home() {
       className="relative space-y-8 md:space-y-12 px-4 py-8 md:py-12 overflow-hidden"
     >
       {/* Left side ambient blob */}
-      <div className="absolute left-0 top-0 h-[600px] w-[600px] bg-blue-500/10 blur-[100px] rounded-full pointer-events-none -translate-x-1/2 -translate-y-1/4"></div>
+      <div className="hidden md:block absolute left-0 top-0 h-[600px] w-[600px] bg-blue-500/10 blur-[100px] rounded-full pointer-events-none -translate-x-1/2 -translate-y-1/4"></div>
 
       {/* Right side ambient blob */}
-      <div className="absolute right-0 top-0 h-[600px] w-[600px] bg-orange-500/10 blur-[100px] rounded-full pointer-events-none translate-x-1/2 -translate-y-1/4"></div>
+      <div className="hidden md:block absolute right-0 top-0 h-[600px] w-[600px] bg-orange-500/10 blur-[100px] rounded-full pointer-events-none translate-x-1/2 -translate-y-1/4"></div>
 
       <motion.header
         initial={{ opacity: 0, y: -20 }}

@@ -238,22 +238,24 @@ SMILES: ${smiles}`;
       <AnimatePresence mode="wait">
         {mainTitle && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            className="text-center p-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="w-full"
           >
-            <motion.h2
-              initial={{ y: 20 }}
-              animate={{ y: 0 }}
-              className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-primary via-primary/50 to-primary bg-clip-text text-transparent flex flex-col sm:flex-row items-center justify-center gap-4"
-            >
-              <span className="break-words text-center max-w-full px-2">{mainTitle}</span>
-              <Button variant="outline" size="sm" onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending} className="shrink-0">
-                <Save className="w-4 h-4 mr-2 text-foreground" />
-                <span className="text-foreground">Save</span>
-              </Button>
-            </motion.h2>
+            <Card className="bg-primary/5 border-primary/20 shadow-sm mt-4">
+              <CardContent className="p-6">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <h2 className="text-xl md:text-2xl font-bold text-primary break-words text-center sm:text-left flex-1">
+                    {mainTitle}
+                  </h2>
+                  <Button variant="outline" size="sm" onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending} className="shrink-0 bg-background/50 hover:bg-background">
+                    <Save className="w-4 h-4 mr-2" />
+                    <span>Save</span>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </motion.div>
         )}
 

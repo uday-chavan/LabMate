@@ -27,39 +27,3 @@
     opacity: 0.8;
   }
 }
-
-@keyframes gradient-animation {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-/* Added CSS for left and right gradient animations */
-body::before,
-body::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  z-index: -1; /* Place gradients behind main content */
-  animation: gradient-animation 10s linear infinite; /* Adjust animation speed as needed */
-  opacity: 0.2;
-}
-
-body::before {
-  left: 0;
-  width: 50%;
-  background: linear-gradient(to right, lightblue, orange);
-}
-
-body::after {
-  right: 0;
-  width: 50%;
-  background: linear-gradient(to left, lightblue, orange);
-}
