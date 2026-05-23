@@ -193,7 +193,7 @@ Step 13: Final Compounding & Processing with additives.`);
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <Card className="border-2 border-primary/20 overflow-hidden h-full">
+            <Card className="border-2 border-primary/20 overflow-hidden h-full bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Info className="w-4 h-4 text-primary" />
@@ -201,7 +201,6 @@ Step 13: Final Compounding & Processing with additives.`);
                 </CardTitle>
               </CardHeader>
               <CardContent className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 pointer-events-none" />
                 <Textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
