@@ -35,22 +35,22 @@ type PropertyData = {
 };
 
 const propertyIcons = {
-  Formula: Atom,
-  Weight: Scale,
+  "Chemical Formula": Atom,
+  "Molecular Weight": Scale,
   Density: Beaker,
-  Boiling: Thermometer,
-  Melting: Thermometer,
+  "Boiling Point": Thermometer,
+  "Melting Point": Thermometer,
   Solubility: Droplet,
-  Structure: Shapes,
+  "Molecular Structure": Shapes,
   Polarity: Zap,
   "Vapor Pressure": Cloud,
   Reactivity: FlaskConical,
   Toxicity: AlertTriangle,
   "Partial Pressure": Gauge,
-  State: Hexagon,
+  "Physical State": Hexagon,
   Viscosity: Waves,
   Stability: FlaskConical,
-  Ionization: ArrowBigDown
+  "Ionization Energy": ArrowBigDown
 };
 
 let cachedSmiles = "";
@@ -102,22 +102,22 @@ export default function PropertyEstimation() {
       const query = `Analyze this SMILES structure and provide ONLY these properties in this EXACT format. Do NOT use markdown formatting like bold text. Include numerical values where applicable and keep descriptions very short (1-3 words):
 
 Common Name: [Common name of the compound]
-Formula: [chemical formula]
-Weight: [X.XX g/mol]
+Chemical Formula: [chemical formula]
+Molecular Weight: [X.XX g/mol]
 Density: [X.XX g/cm³]
-Boiling: [XXX°C]
-Melting: [XXX°C]
+Boiling Point: [XXX°C]
+Melting Point: [XXX°C]
 Solubility: [brief phrase]
-Structure: [brief phrase]
+Molecular Structure: [brief phrase]
 Polarity: [polar/nonpolar/etc]
 Vapor Pressure: [X.XX mmHg at 25°C]
 Reactivity: [low/medium/high]
 Toxicity: [brief hazard level]
 Partial Pressure: [X.XX mmHg]
-State: [solid/liquid/gas]
+Physical State: [solid/liquid/gas]
 Viscosity: [X.XX cP]
 Stability: [stable/unstable]
-Ionization: [X.XX eV]
+Ionization Energy: [X.XX eV]
 
 SMILES: ${smiles}`;
 
