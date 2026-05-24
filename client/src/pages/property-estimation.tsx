@@ -43,10 +43,10 @@ const propertyIcons = {
   Solubility: Droplet,
   Structure: Shapes,
   Polarity: Zap,
-  Vapor: Cloud,
+  "Vapor Pressure": Cloud,
   Reactivity: FlaskConical,
   Toxicity: AlertTriangle,
-  Pressure: Gauge,
+  "Partial Pressure": Gauge,
   State: Hexagon,
   Viscosity: Waves,
   Stability: FlaskConical,
@@ -109,10 +109,10 @@ Melting: [XXX°C]
 Solubility: [brief phrase]
 Structure: [brief phrase]
 Polarity: [polar/nonpolar/etc]
-Vapor: [X.XX kPa at 25°C]
+Vapor Pressure: [X.XX kPa at 25°C]
 Reactivity: [low/medium/high]
 Toxicity: [brief hazard level]
-Pressure: [X.XX atm]
+Partial Pressure: [X.XX atm]
 State: [solid/liquid/gas]
 Viscosity: [X.XX cP]
 Stability: [stable/unstable]
