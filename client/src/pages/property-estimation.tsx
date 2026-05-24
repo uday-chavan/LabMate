@@ -99,8 +99,9 @@ export default function PropertyEstimation() {
     setAbortController(controller);
 
     try {
-      const query = `Analyze this SMILES structure and provide ONLY these properties in this EXACT format. Include numerical values where applicable and keep descriptions very short (1-3 words):
+      const query = `Analyze this SMILES structure and provide ONLY these properties in this EXACT format. Do NOT use markdown formatting like bold text. Include numerical values where applicable and keep descriptions very short (1-3 words):
 
+Common Name: [Common name of the compound]
 Formula: [chemical formula]
 Weight: [X.XX g/mol]
 Density: [X.XX g/cm³]
@@ -109,10 +110,10 @@ Melting: [XXX°C]
 Solubility: [brief phrase]
 Structure: [brief phrase]
 Polarity: [polar/nonpolar/etc]
-Vapor Pressure: [X.XX kPa at 25°C]
+Vapor Pressure: [X.XX mmHg at 25°C]
 Reactivity: [low/medium/high]
 Toxicity: [brief hazard level]
-Partial Pressure: [X.XX atm]
+Partial Pressure: [X.XX mmHg]
 State: [solid/liquid/gas]
 Viscosity: [X.XX cP]
 Stability: [stable/unstable]
@@ -124,23 +125,50 @@ SMILES: ${smiles}`;
       const lines = result.split('\n').filter(line => line.trim());
 
       if (lines.length > 0) {
-        setMainTitle(lines[0]); // First line is the formula
+        let name = "Unknown Compound";
+        const extractedProperties: PropertyData[] = [];
 
-        const extractedProperties = lines.slice(1).map(line => {
-          const [key, ...valueParts] = line.split(':');
+        lines.forEach(line => {
+          // Remove markdown bold/italics
+          const cleanLine = line.replace(/[*_`]/g, '').trim();
+
+          if (!cleanLine) return;
+
+          if (!cleanLine.includes(':')) {
+            // Might be the title if it's the first few lines and no properties found yet
+            if (extractedProperties.length === 0 && name === "Unknown Compound") {
+              name = cleanLine;
+            }
+            return;
+          }
+
+          const [key, ...valueParts] = cleanLine.split(':');
           const cleanKey = key.trim();
           const value = valueParts.join(':').trim();
 
-          if (!cleanKey || !value || !propertyIcons[cleanKey as keyof typeof propertyIcons]) {
-            return null;
+          if (cleanKey.toLowerCase() === 'common name' || cleanKey.toLowerCase() === 'name') {
+            name = value;
+            return;
           }
 
-          return {
-            title: cleanKey,
-            value,
-            icon: propertyIcons[cleanKey as keyof typeof propertyIcons]
-          };
-        }).filter(Boolean) as PropertyData[];
+          // Try to find matching icon key
+          const iconKey = Object.keys(propertyIcons).find(k => k.toLowerCase() === cleanKey.toLowerCase());
+
+          if (iconKey && value) {
+            extractedProperties.push({
+              title: iconKey,
+              value,
+              icon: propertyIcons[iconKey as keyof typeof propertyIcons]
+            });
+          }
+        });
+
+        if (name === "Unknown Compound" && lines.length > 0) {
+          const firstLine = lines[0].replace(/[*_`]/g, '').trim();
+          name = firstLine.includes(':') ? (firstLine.split(':')[1]?.trim() || firstLine) : firstLine;
+        }
+
+        setMainTitle(name);
 
         // Shuffle the properties array for random display
         const shuffledProperties = [...extractedProperties]
@@ -195,7 +223,7 @@ SMILES: ${smiles}`;
         </p>
       </motion.div>
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.3, ease: "easeOut", delay: 0.1 }}
