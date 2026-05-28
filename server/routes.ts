@@ -244,11 +244,12 @@ router.post('/api/predict-process', async (req, res) => {
   try {
     const schema = z.object({
       query: z.string().min(1, "Query is required"),
+      raw: z.boolean().optional(),
     });
 
-    const { query } = schema.parse(req.body);
+    const { query, raw } = schema.parse(req.body);
     
-    const prompt = `As a chemistry expert, provide a comprehensive analysis of this process/reaction query. Start with a clear, concise one-line answer, then provide a detailed explanation.
+    const prompt = raw ? query : `As a chemistry expert, provide a comprehensive analysis of this process/reaction query. Start with a clear, concise one-line answer, then provide a detailed explanation.
 
 Use these professional symbols only at the start of points, not in between text:
 ⚛️ - For atomic/molecular processes

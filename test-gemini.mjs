@@ -1,63 +1,40 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import fetch from "node-fetch";
+(async () => {
+  const query = `Calculate the Density for SMILES: C#N using the most appropriate estimation method (e.g., Joback, Lydersen, UNIFAC, Orrick-Erbar, etc.).
+For properties like Ionization Energy, use alternative structural or group contribution approximations if standard ones don't apply, and state the method used.
 
-const GEMINI_KEYS = [
-  'AIzaSyCGq0qrMqMIuFUQ156k3WY_pg41jZkLLMw',
-  'AIzaSyBTHtJMEUHbEc1gt_NNLhF8UeLvi9706T4',
-  'AIzaSyBkDVhV0bq3geQyaJQDt1MuJT7Qk_hHSJA',
-  'AIzaSyCWUAiXrWB6GoMmyr5b72RuptDWF3PLHt0',
-];
+CRITICAL INSTRUCTIONS:
+1. You MUST return ONLY a valid, parsable JSON object. No markdown formatting (\`\`\`json), no conversational text, no warnings outside the JSON.
+2. Keep all text extremely concise (maximum 3-4 words per field). DO NOT write theory, explanations, or essays.
+3. If the property depends on temperature/pressure (e.g. Viscosity, Vapor Pressure, Density), ASSUME STANDARD CONDITIONS (298.15 K, 1 atm) and proceed with the calculation.
+4. If a calculation is strictly mathematically impossible for this SMILES even under standard conditions, return a step "Status" with value "Not applicable". DO NOT use "Not applicable" just because variables were missing.
+5. IF YOU ABSOLUTELY CANNOT CALCULATE IT, YOU MUST STILL RETURN ONLY A VALID JSON WITH "methodSubtitle": "GCM — NO SUITABLE METHOD" AND FILL THE REST WITH "Not applicable" OR EMPTY ARRAYS. NEVER RETURN PLAIN TEXT EXPLANATIONS.
 
-const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
-
-function isKeyError(status) {
-  return status === 401 || status === 403 || status === 429 || status === 503;
-}
-
-async function callWithKeyRotation(body) {
-  let lastError = '';
-  for (const key of GEMINI_KEYS) {
-    const url = GEMINI_BASE + '?key=' + key;
-    let res;
-    try {
-      res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-    } catch (netErr) {
-      lastError = netErr.message;
-      continue;
-    }
-
-    if (res.ok) return res.json();
-
-    lastError = 'HTTP ' + res.status;
-    if (isKeyError(res.status)) continue;
-
-    const errText = await res.text().catch(() => res.statusText);
-    throw new Error('Gemini API error: ' + errText);
+Exact JSON schema required:
+{
+  "methodSubtitle": "GCM — [NAME OF METHOD USED]",
+  "given": [
+    { "label": "Group Name/Property", "value": "Contribution/Value" }
+  ],
+  "formula": "Base + Σ (Contributions) or relevant formula",
+  "steps": [
+    { "label": "Short Step Name", "value": "Result" }
+  ],
+  "finalResult": {
+    "value": "Numeric value",
+    "unit": "Unit"
   }
-  throw new Error('All Gemini API keys exhausted. Last error: ' + lastError);
-}
-
-async function test() {
-  const prompt = 'Hello';
-  const requestBody = {
-    contents: [{ parts: [{ text: prompt }] }],
-    generationConfig: { temperature: 0.8, topK: 32, topP: 0.9, maxOutputTokens: 1024 },
-    safetySettings: [
-      { category: 'HARM_CATEGORY_HARASSMENT',        threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-      { category: 'HARM_CATEGORY_HATE_SPEECH',        threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-      { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',  threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-      { category: 'HARM_CATEGORY_DANGEROUS_CONTENT',  threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-    ],
-  };
-
+}`;
   try {
-    const data = await callWithKeyRotation(requestBody);
-    console.log(data.candidates[0].content.parts[0].text);
-  } catch (err) {
-    console.error(err);
+    const res = await fetch('http://localhost:5000/api/predict-process', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, raw: true })
+    });
+    const data = await res.json();
+    console.log("RESPONSE LENGTH:", data.prediction?.length);
+    console.log("RESPONSE:", JSON.stringify(data, null, 2));
+  } catch(e) {
+    console.error(e);
   }
-}
-test();
+})();

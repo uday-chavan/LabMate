@@ -146,7 +146,7 @@ export default function Home() {
         </motion.div>
       </div>
 
-      <motion.div 
+      <motion.div
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mt-8 relative z-10 max-w-6xl mx-auto px-2 lg:px-8"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -186,8 +186,8 @@ export default function Home() {
                       {card.description}
                     </p>
                     <div className="mt-4 flex">
-                      <Button 
-                        variant="secondary" 
+                      <Button
+                        variant="secondary"
                         className="w-full sm:w-auto h-12 px-6 rounded-xl bg-primary/10 text-black dark:text-white font-bold text-lg tracking-wide hover:bg-primary/20 border-black/50 dark:border-white/50 border-2 transition-all duration-300"
                       >
                         {card.actionText || "Use"}

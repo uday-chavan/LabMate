@@ -6,11 +6,11 @@
 
 import { compressImage } from "./image-compressor";
 
-export async function predictProcess(query: string, signal?: AbortSignal): Promise<string> {
+export async function predictProcess(query: string, signal?: AbortSignal, raw: boolean = false): Promise<string> {
   const response = await fetch('/api/predict-process', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query }),
+    body: JSON.stringify({ query, raw }),
     signal,
   });
 

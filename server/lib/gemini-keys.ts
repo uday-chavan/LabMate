@@ -24,7 +24,7 @@ interface KeyState {
 // ─── Load keys once at module init ───────────────────────────────────────────
 function loadKeys(): KeyState[] {
   const keys: KeyState[] = [];
-  for (let i = 1; i <= 10; i++) {
+  for (let i = 1; i <= 50; i++) {
     const k = process.env[`GEMINI_API_KEY_${i}`]?.trim();
     if (k) keys.push({ key: k, failures: 0, cooledDownUntil: 0 });
   }
@@ -54,13 +54,16 @@ function markSuccess(state: KeyState) {
 }
 
 /** Mark a key as having failed. If it hits the threshold, put it in cooldown. */
-function markFailure(state: KeyState, reason: string) {
+function markFailure(state: KeyState, reason: string, status?: number) {
   state.failures += 1;
   const keyHint = `...${state.key.slice(-6)}`;
-  if (state.failures >= MAX_CONSECUTIVE_FAILS) {
+  // If it's a 429 Too Many Requests, put it in cooldown immediately. Otherwise wait for 3 consecutive failures.
+  const limit = status === 429 ? 1 : MAX_CONSECUTIVE_FAILS;
+  
+  if (state.failures >= limit) {
     state.cooledDownUntil = Date.now() + COOLDOWN_MS;
     console.warn(
-      `[gemini-keys] Key ${keyHint} placed in cooldown for ${COOLDOWN_MS / 1000}s after ${state.failures} failures. Reason: ${reason}`
+      `[gemini-keys] Key ${keyHint} placed in cooldown for ${COOLDOWN_MS / 1000}s. Reason: ${reason}`
     );
   } else {
     console.warn(`[gemini-keys] Key ${keyHint} failure #${state.failures}: ${reason}`);
@@ -69,7 +72,7 @@ function markFailure(state: KeyState, reason: string) {
 
 /** Returns true if the HTTP status indicates a key-level problem (quota / auth). */
 function isKeyError(status: number): boolean {
-  return status === 401 || status === 403 || status === 429 || status === 503;
+  return status === 401 || status === 403 || status === 429 || status >= 500;
 }
 
 export interface GeminiRequest {
@@ -90,56 +93,64 @@ export interface GeminiResponse {
  * @throws Error if all keys fail or no keys are configured.
  */
 export async function callGemini(body: GeminiRequest): Promise<GeminiResponse> {
-  const keys = availableKeys();
+  while (true) {
+    const keys = availableKeys();
 
-  if (keys.length === 0) {
-    // All keys in cooldown — wait for the one that recovers soonest
-    const soonest = keyStates.reduce((a, b) =>
-      a.cooledDownUntil < b.cooledDownUntil ? a : b
-    );
-    const waitMs = soonest.cooledDownUntil - Date.now();
-    throw new Error(
-      `All API keys are temporarily rate-limited. Please wait ~${Math.ceil(waitMs / 1000)}s and try again.`
-    );
+    if (keys.length === 0) {
+      if (keyStates.length === 0) {
+        throw new Error("No API keys configured.");
+      }
+      // All keys in cooldown — wait for the one that recovers soonest
+      const soonest = keyStates.reduce((a, b) =>
+        a.cooledDownUntil < b.cooledDownUntil ? a : b
+      );
+      const waitMs = Math.max(1000, soonest.cooledDownUntil - Date.now());
+      console.log(`[gemini-keys] All keys in cooldown. Waiting ${Math.ceil(waitMs / 1000)}s...`);
+      await new Promise(r => setTimeout(r, waitMs));
+      continue; // try again after waiting
+    }
+
+    let lastError = "";
+
+    for (const state of keys) {
+      const url = `${GEMINI_BASE}?key=${state.key}`;
+
+      let res: Response;
+      try {
+        res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+      } catch (networkErr: any) {
+        lastError = `Network error: ${networkErr.message}`;
+        markFailure(state, lastError);
+        continue; // try next key
+      }
+
+      if (res.ok) {
+        const data = await res.json() as GeminiResponse;
+        markSuccess(state);
+        return data;
+      }
+
+      const errText = await res.text().catch(() => res.statusText);
+      lastError = `HTTP ${res.status}: ${errText.slice(0, 120)}`;
+
+      const isKeyErr = isKeyError(res.status) || 
+                       /api[\s_-]?key/i.test(errText) || 
+                       /key[\s_-]?not[\s_-]?valid/i.test(errText) || 
+                       /invalid[\s_-]?key/i.test(errText);
+
+      if (isKeyErr) {
+        markFailure(state, lastError, res.status);
+        continue; // try next key
+      }
+
+      // Non-key error (e.g., 400 bad request) — don't blame the key, throw immediately
+      throw new Error(`API error: ${lastError}`);
+    }
   }
-
-  let lastError = "";
-
-  for (const state of keys) {
-    const url = `${GEMINI_BASE}?key=${state.key}`;
-
-    let res: Response;
-    try {
-      res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-    } catch (networkErr: any) {
-      lastError = `Network error: ${networkErr.message}`;
-      markFailure(state, lastError);
-      continue; // try next key
-    }
-
-    if (res.ok) {
-      const data = await res.json() as GeminiResponse;
-      markSuccess(state);
-      return data;
-    }
-
-    const errText = await res.text().catch(() => res.statusText);
-    lastError = `HTTP ${res.status}: ${errText.slice(0, 120)}`;
-
-    if (isKeyError(res.status)) {
-      markFailure(state, lastError);
-      continue; // try next key
-    }
-
-    // Non-key error (e.g., 400 bad request) — don't blame the key, throw immediately
-    throw new Error(`API error: ${lastError}`);
-  }
-
-  throw new Error(`All API key's limit exhausted.`);
 }
 
 /**
