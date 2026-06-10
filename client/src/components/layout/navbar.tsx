@@ -118,7 +118,7 @@ export default function Navbar() {
 
   const getCroppedImg = async () => {
     if (!completedCrop || !imgRef.current) return;
-    
+
     const image = imgRef.current;
     const canvas = document.createElement('canvas');
     const scaleX = image.naturalWidth / image.width;
@@ -127,7 +127,7 @@ export default function Navbar() {
     canvas.height = completedCrop.height;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    
+
     ctx.drawImage(
       image,
       completedCrop.x * scaleX,
@@ -139,7 +139,7 @@ export default function Navbar() {
       completedCrop.width,
       completedCrop.height
     );
-    
+
     const base64Image = canvas.toDataURL('image/jpeg', 0.9);
     try {
       const compressed = await compressImage(base64Image);
@@ -176,21 +176,22 @@ export default function Navbar() {
             {menuItems.map(({ href, icon: Icon, label }) => {
               const isActive = location === href;
               return (
-              <NavigationMenuItem key={href}>
-                <Link href={href}>
-                  <NavigationMenuLink className={`flex items-center gap-2 px-3 py-2 text-sm transition-all rounded-md ${isActive ? 'bg-primary/10 border-2 border-primary text-primary font-bold shadow-sm' : 'hover:bg-accent hover:text-accent-foreground border-2 border-transparent'}`}>
-                    <Icon className="h-4 w-4" />
-                    <span className="whitespace-nowrap">{label}</span>
-                  </NavigationMenuLink>
-                </Link>
-              </NavigationMenuItem>
-            )})}
+                <NavigationMenuItem key={href}>
+                  <Link href={href}>
+                    <NavigationMenuLink className={`flex items-center gap-2 px-3 py-2 text-sm transition-all rounded-md ${isActive ? 'bg-primary/10 border-2 border-primary text-primary font-bold shadow-sm' : 'hover:bg-accent hover:text-accent-foreground border-2 border-transparent'}`}>
+                      <Icon className="h-4 w-4" />
+                      <span className="whitespace-nowrap">{label}</span>
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+              )
+            })}
           </NavigationMenuList>
         </NavigationMenu>
 
         <div className="ml-auto flex items-center gap-2 md:gap-4">
           <AlertButton />
-          
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-10 w-10 mr-1 md:mr-4 rounded-full border border-black overflow-hidden p-0">
@@ -222,9 +223,9 @@ export default function Navbar() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             className="md:hidden"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
@@ -238,7 +239,7 @@ export default function Navbar() {
       </div>
 
       {/* Mobile Menu */}
-      <div 
+      <div
         className={`md:hidden ${mobileMenuOpen ? 'block' : 'hidden'}`}
       >
         <div className="border-t bg-background">
@@ -247,7 +248,7 @@ export default function Navbar() {
               const isActive = location === href;
               return (
                 <Link key={href} href={href}>
-                  <a 
+                  <a
                     onClick={() => setMobileMenuOpen(false)}
                     className={`flex items-center gap-3 px-4 py-3 text-sm rounded-md transition-all ${isActive ? 'bg-primary/10 border-2 border-primary text-primary font-bold shadow-sm' : 'hover:bg-accent hover:text-accent-foreground border-2 border-transparent'}`}
                   >
@@ -306,7 +307,7 @@ export default function Navbar() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setProfileOpen(false)}>Cancel</Button>
-            <Button 
+            <Button
               onClick={() => profileMutation.mutate({ displayName: editName, avatarUrl: editAvatar })}
               disabled={profileMutation.isPending}
             >
